@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+.christmas-theme {
+    --background: 0 30% 8%;
+    --foreground: 40 20% 95%;
+
+    --card: 0 25% 12%;
+    --card-foreground: 40 20% 95%;
+
+    --popover: 0 25% 10%;
+    --popover-foreground: 40 20% 95%;
+
+    --primary: 43 74% 49%;
+    --primary-foreground: 0 30% 8%;
+
+    --secondary: 0 40% 25%;
+    --secondary-foreground: 40 20% 95%;
+
+    --muted: 0 20% 18%;
+    --muted-foreground: 40 10% 70%;
+
+    --accent: 43 74% 49%;
+    --accent-foreground: 0 30% 8%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 20% 25%;
+    --input: 0 20% 20%;
+    --ring: 43 74% 49%;
+
+    --radius: 0.5rem;
+
+    /* Christmas theme tokens */
+    --christmas-red: 0 65% 35%;
+    --christmas-green: 140 50% 25%;
+    --christmas-gold: 43 74% 49%;
+    --christmas-cream: 40 30% 92%;
+    --christmas-warm: 25 80% 60%;
+
+    /* Gradients */
+    --gradient-christmas: radial-gradient(ellipse at top, hsl(0 40% 18%) 0%, hsl(0 30% 8%) 70%);
+    --gradient-gold: linear-gradient(135deg, hsl(43 74% 49%) 0%, hsl(35 80% 40%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 25% 15%) 0%, hsl(0 25% 10%) 100%);
+
+    /* Shadows */
+    --shadow-glow: 0 0 30px hsl(43 74% 49% / 0.3);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
+    --shadow-photo: 0 4px 20px hsl(0 0% 0% / 0.5);
+
+    /* Fonts */
+    --font-display: 'Playfair Display', serif;
+    --font-script: 'Dancing Script', cursive;
+
+    /* Apply background and font to the container */
+    background: var(--gradient-christmas);
+    color: hsl(var(--foreground));
+    font-family: var(--font-display);
+    min-height: 100vh;
+}
+
+/* Utilities inside the theme */
+
+.christmas-theme .font-script {
+    font-family: var(--font-script);
+}
+
+.christmas-theme .font-display {
+    font-family: var(--font-display);
+}
+
+.christmas-theme .text-gold {
+    color: hsl(var(--christmas-gold));
+}
+
+.christmas-theme .bg-gold {
+    background: var(--gradient-gold);
+}
+
+.christmas-theme .glow-gold {
+    box-shadow: var(--shadow-glow);
+}
+
+.christmas-theme .photo-frame {
+    background: hsl(var(--christmas-cream));
+    box-shadow: var(--shadow-photo);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.christmas-theme .photo-frame:hover {
+    transform: scale(1.05) rotate(2deg);
+    box-shadow: 0 8px 40px hsl(0 0% 0% / 0.6), var(--shadow-glow);
+}
+
+.christmas-theme .card-letter {
+    background: var(--gradient-card);
+    border: 1px solid hsl(var(--christmas-gold) / 0.3);
+    box-shadow: var(--shadow-card);
+}
+
+/* Bokeh effect */
+.christmas-theme .bokeh-container {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.christmas-theme .bokeh-light {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(1px);
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translateY(-20px) scale(1.1);
+        opacity: 1;
+    }
+}
+
+@keyframes twinkle {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes sparkle {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1) rotate(180deg);
+    }
+}
+
+.christmas-theme .animate-twinkle {
+    animation: twinkle 2s ease-in-out infinite;
+}
+
+.christmas-theme .animate-sparkle {
+    animation: sparkle 3s ease-in-out infinite;
+}
+
+/* Letter reveal animation */
+@keyframes reveal {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.christmas-theme .animate-reveal {
+    animation: reveal 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Snow effect */
+@keyframes snow {
+    0% {
+        transform: translateY(-10vh) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0.3;
+    }
+}
+
+.christmas-theme .snowflake {
+    animation: snow linear infinite;
+}

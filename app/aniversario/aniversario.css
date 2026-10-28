@@ -1,0 +1,498 @@
+/* Anniversary Page - Elegant & Romantic */
+
+.anniversary-page {
+    background: #f5f0eb;
+    min-height: 100vh;
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+/* Hero Section */
+.hero-anniversary {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5e6e8 0%, #ede4e0 50%, #f5ece8 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-decorator {
+    position: absolute;
+    font-size: 2.5rem;
+    opacity: 0.15;
+    animation: float-decorator 6s ease-in-out infinite;
+}
+
+.hero-decorator.heart-left {
+    top: 15%;
+    left: 8%;
+    animation-delay: 0s;
+}
+
+.hero-decorator.heart-right {
+    bottom: 20%;
+    right: 12%;
+    animation-delay: 2s;
+}
+
+.hero-decorator.heart-top {
+    top: 25%;
+    right: 20%;
+    animation-delay: 4s;
+}
+
+@keyframes float-decorator {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.15;
+    }
+
+    50% {
+        transform: translateY(-20px) scale(1.1);
+        opacity: 0.25;
+    }
+}
+
+.hero-content-anniversary {
+    text-align: center;
+    max-width: 800px;
+    animation: fade-in-up 1.2s ease-out;
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-subtitle-anniversary {
+    font-size: 0.875rem;
+    letter-spacing: 3px;
+    color: #8b7a7a;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    font-weight: 400;
+}
+
+.hero-title-anniversary {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 300;
+    color: #4a3a3a;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+}
+
+.title-highlight {
+    color: #b88989;
+    font-style: italic;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.hero-text-anniversary {
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    color: #6a5a5a;
+    line-height: 1.8;
+    margin-top: 2rem;
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 3rem;
+    text-align: center;
+    animation: fade-in 1.5s ease-out 1s both;
+}
+
+.scroll-indicator p {
+    font-size: 0.875rem;
+    color: #8b7a7a;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+.scroll-icon {
+    width: 30px;
+    height: 50px;
+    border: 2px solid #b88989;
+    border-radius: 20px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.scroll-wheel {
+    width: 4px;
+    height: 8px;
+    background: #b88989;
+    border-radius: 2px;
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: scroll-animation 2s ease-in-out infinite;
+}
+
+@keyframes scroll-animation {
+
+    0%,
+    100% {
+        top: 8px;
+        opacity: 1;
+    }
+
+    50% {
+        top: 24px;
+        opacity: 0;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Letter Section */
+.letter-section {
+    background: #fff;
+    padding: 8rem 2rem;
+}
+
+.letter-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.letter-category {
+    font-size: 0.875rem;
+    letter-spacing: 3px;
+    color: #8b7a7a;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.letter-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    color: #4a3a3a;
+}
+
+.letter-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #faf8f6;
+    border-radius: 8px;
+    padding: 4rem 3rem;
+    box-shadow: 0 20px 60px rgba(139, 105, 105, 0.08);
+    border: 1px solid rgba(139, 105, 105, 0.1);
+}
+
+.letter-content {
+    color: #4a4a4a;
+}
+
+.letter-greeting {
+    font-size: 1.25rem;
+    color: #b88989;
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
+.letter-paragraph {
+    font-size: 1.125rem;
+    line-height: 2;
+    margin-bottom: 1.5rem;
+    text-align: justify;
+}
+
+.highlight-paragraph {
+    background: linear-gradient(120deg, rgba(184, 137, 137, 0.1) 0%, transparent 100%);
+    padding: 1.5rem;
+    border-left: 3px solid #b88989;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+}
+
+.letter-signature {
+    font-size: 1.125rem;
+    text-align: right;
+    margin-top: 3rem;
+    color: #6a5a5a;
+    font-style: italic;
+}
+
+.letter-signature span {
+    display: block;
+    margin-top: 0.5rem;
+    color: #b88989;
+}
+
+/* Memories Section */
+.memories-section {
+    background: #f5f0eb;
+    padding: 8rem 2rem;
+}
+
+.memories-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.memories-category {
+    font-size: 0.875rem;
+    letter-spacing: 3px;
+    color: #8b7a7a;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.memories-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    color: #4a3a3a;
+    margin-bottom: 1rem;
+}
+
+.memories-subtitle {
+    font-size: 1.125rem;
+    color: #6a5a5a;
+    font-style: italic;
+}
+
+.memories-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.memory-card {
+    aspect-ratio: 4/5;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(139, 105, 105, 0.12);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.memory-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 30px 80px rgba(139, 105, 105, 0.18);
+}
+
+.memory-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f7f3ef 0%, #ede9e5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.memory-icon {
+    font-size: 3rem;
+    opacity: 0.25;
+}
+
+/* CTA Section */
+.cta-section {
+    min-height: 90vh;
+    background: linear-gradient(135deg, #f5e6e8 0%, #ede4e0 50%, #f5ece8 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem;
+    position: relative;
+}
+
+.cta-content {
+    text-align: center;
+    max-width: 700px;
+}
+
+.cta-category {
+    font-size: 0.875rem;
+    letter-spacing: 3px;
+    color: #8b7a7a;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+}
+
+.cta-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 300;
+    color: #4a3a3a;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+}
+
+.cta-highlight {
+    color: #b88989;
+    font-style: italic;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.cta-text {
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    color: #6a5a5a;
+    line-height: 1.8;
+    margin-bottom: 3rem;
+}
+
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2.5rem;
+    background: linear-gradient(135deg, #a67c7c 0%, #8b6969 100%);
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 400;
+    text-decoration: none;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(139, 105, 105, 0.3);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.cta-button:hover::before {
+    left: 100%;
+}
+
+.cta-button:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(139, 105, 105, 0.4);
+}
+
+.button-icon {
+    font-size: 1.25rem;
+}
+
+.button-heart {
+    font-size: 1.25rem;
+    animation: beat-heart 1.5s ease-in-out infinite;
+}
+
+@keyframes beat-heart {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    10%,
+    30% {
+        transform: scale(1.2);
+    }
+
+    20%,
+    40% {
+        transform: scale(1);
+    }
+}
+
+.cta-footer {
+    position: absolute;
+    bottom: 2rem;
+    text-align: center;
+}
+
+.cta-footer p {
+    font-size: 0.875rem;
+    color: #8b7a7a;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+
+    .hero-anniversary,
+    .cta-section {
+        padding: 6rem 1.5rem 3rem;
+    }
+
+    .letter-section,
+    .memories-section {
+        padding: 5rem 1.5rem;
+    }
+
+    .letter-card {
+        padding: 3rem 2rem;
+    }
+
+    .memories-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .hero-decorator {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 640px) {
+
+    .hero-anniversary,
+    .cta-section {
+        padding: 5rem 1rem 2rem;
+    }
+
+    .letter-section,
+    .memories-section {
+        padding: 4rem 1rem;
+    }
+
+    .letter-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .letter-paragraph {
+        font-size: 1rem;
+        text-align: left;
+    }
+
+    .memories-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-button {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+
+    .hero-decorator {
+        display: none;
+    }
+
+    .scroll-indicator {
+        bottom: 2rem;
+    }
+}

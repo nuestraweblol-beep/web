@@ -1,0 +1,451 @@
+/* Libro - Historia Page (book styling) */
+
+.libro-page {
+    background: linear-gradient(180deg, #f6efe4 0%, #efe4d4 45%, #f6efe4 100%);
+    min-height: 100vh;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: #4a3f35;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.libro-page * {
+    box-sizing: border-box;
+}
+
+.libro-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle at 15% 20%, rgba(196, 139, 90, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(139, 105, 105, 0.08) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Hero / Cover */
+.libro-hero {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9rem 2rem 3rem;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.libro-hero-content {
+    max-width: 720px;
+}
+
+.libro-ribbon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 9999px;
+    background: rgba(196, 139, 90, 0.12);
+    margin-bottom: 1.5rem;
+    color: #a8703f;
+}
+
+.libro-title {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: #5c4632;
+    margin-bottom: 1.25rem;
+}
+
+.libro-subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-style: italic;
+    font-weight: 300;
+    color: #8b6f4e;
+    letter-spacing: 0.03em;
+}
+
+.libro-divider-top {
+    width: 80px;
+    height: 2px;
+    margin: 2rem auto 0;
+    background: linear-gradient(90deg, transparent 0%, #c48b5a 50%, transparent 100%);
+}
+
+/* Book container */
+.libro-book {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 1.5rem 8rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* A chapter = one "page" of the book */
+.libro-chapter {
+    background: #fffdf8;
+    border: 1px solid rgba(196, 139, 90, 0.18);
+    border-radius: 6px;
+    box-shadow: 0 25px 60px -20px rgba(92, 70, 50, 0.18), 0 2px 6px rgba(92, 70, 50, 0.06);
+    padding: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 3.5rem;
+    position: relative;
+}
+
+/* Page-corner effect */
+.libro-chapter::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, transparent 50%, rgba(196, 139, 90, 0.15) 50%);
+    border-bottom-right-radius: 6px;
+}
+
+.libro-chapter-label {
+    display: block;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #b58657;
+    margin-bottom: 0.6rem;
+    font-family: 'Georgia', serif;
+}
+
+.libro-chapter-title {
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+    font-weight: 400;
+    color: #5c4632;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px dashed rgba(196, 139, 90, 0.3);
+}
+
+.libro-text p {
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    line-height: 1.9;
+    color: #4a3f35;
+    margin-bottom: 1.15rem;
+    font-weight: 400;
+    text-align: justify;
+}
+
+.libro-text p:first-of-type:first-letter {
+    font-size: 3.4rem;
+    font-weight: 700;
+    float: left;
+    line-height: 0.85;
+    margin: 0.1rem 0.4rem 0 0;
+    color: #a8703f;
+}
+
+.libro-text p.dialogo {
+    text-align: center;
+    font-style: italic;
+    color: #8b5e3c;
+    font-size: 1.15rem;
+    margin: 1.5rem 0;
+}
+
+/* Reserved image slot */
+.libro-image-slot {
+    margin: 2rem 0;
+    aspect-ratio: 16/10;
+    border-radius: 6px;
+    border: 1.5px dashed rgba(196, 139, 90, 0.35);
+    background: linear-gradient(135deg, #faf6ee 0%, #f1e7d6 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #b58657;
+}
+
+.libro-image-slot svg {
+    opacity: 0.5;
+}
+
+.libro-image-slot span {
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+/* Page number footer */
+.libro-page-number {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    color: #b58657;
+    font-style: italic;
+}
+
+/* Interactive book stage: one page visible at a time, flipping like a real book */
+.libro-stage {
+    position: relative;
+    height: clamp(800px, 96vh, 1450px);
+    perspective: 2400px;
+}
+
+.libro-leaf {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+.libro-leaf .libro-chapter {
+    height: 100%;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.libro-leaf .libro-text {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 0.75rem;
+    scrollbar-width: thin;
+    scrollbar-color: #c48b5a transparent;
+}
+
+.libro-leaf .libro-chapter-label {
+    margin-bottom: 0.35rem;
+}
+
+.libro-leaf .libro-chapter-title {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    flex-shrink: 0;
+}
+
+.libro-leaf .libro-page-number {
+    margin-top: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Photo placeholder shrinks down inside the fixed-height page frame,
+   otherwise it eats most of the space and squeezes the story text. */
+.libro-leaf .libro-image-slot {
+    aspect-ratio: unset;
+    height: 120px;
+    margin: 0.75rem 0;
+    padding: 0.25rem;
+    flex-shrink: 0;
+}
+
+.libro-leaf .libro-image-slot svg {
+    height: 100%;
+    width: auto;
+    opacity: 1;
+}
+
+.libro-leaf .libro-text::-webkit-scrollbar {
+    width: 6px;
+}
+
+.libro-leaf .libro-text::-webkit-scrollbar-thumb {
+    background: rgba(196, 139, 90, 0.4);
+    border-radius: 3px;
+}
+
+.libro-leaf .libro-image-slot {
+    flex-shrink: 0;
+}
+
+.libro-leaf-base {
+    z-index: 1;
+}
+
+.libro-leaf-top {
+    z-index: 2;
+    transform-origin: left center;
+    transform: rotateY(0deg);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    transition: transform 0.6s cubic-bezier(0.45, 0.05, 0.15, 1), box-shadow 0.6s ease;
+}
+
+.leaf-next.leaf-active {
+    transform: rotateY(-150deg);
+    box-shadow: -20px 0 40px rgba(74, 63, 53, 0.3);
+}
+
+.leaf-prev.leaf-active {
+    transform: rotateY(150deg);
+    box-shadow: 20px 0 40px rgba(74, 63, 53, 0.3);
+}
+
+/* Click zones on page edges to turn pages */
+.libro-edge {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 14%;
+    z-index: 3;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    color: #b58657;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.25s ease, background 0.25s ease;
+}
+
+.libro-edge:hover:not(:disabled) {
+    opacity: 1;
+}
+
+.libro-edge:disabled {
+    cursor: default;
+}
+
+.libro-edge-left {
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 0.5rem;
+    background: linear-gradient(90deg, rgba(196, 139, 90, 0.12), transparent);
+}
+
+.libro-edge-right {
+    right: 0;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    background: linear-gradient(270deg, rgba(196, 139, 90, 0.12), transparent);
+}
+
+/* Prev/next controls + page counter, below the stage */
+.libro-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.libro-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(196, 139, 90, 0.3);
+    background: #fffdf8;
+    color: #a8703f;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.libro-nav-btn:hover:not(:disabled) {
+    background: rgba(196, 139, 90, 0.12);
+    transform: scale(1.06);
+}
+
+.libro-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.libro-nav-count {
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    color: #8b6f4e;
+    font-style: italic;
+    min-width: 4.5rem;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .libro-stage {
+        height: clamp(520px, 78vh, 760px);
+    }
+
+    .libro-edge {
+        width: 10%;
+    }
+}
+
+/* Preface letter, before chapter 1 */
+.libro-carta {
+    background: #fffaf0;
+    border-color: rgba(196, 139, 90, 0.3);
+    border-top: 3px double rgba(196, 139, 90, 0.4);
+}
+
+.libro-carta .libro-text p {
+    font-style: italic;
+    text-align: left;
+}
+
+.libro-carta .libro-text p:first-of-type:first-letter {
+    font-style: normal;
+}
+
+.libro-firma {
+    text-align: right;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: #a8703f;
+    margin-top: 1.5rem;
+}
+
+/* Epilogue */
+.libro-epilogo {
+    background: linear-gradient(180deg, #5c4632 0%, #4a3826 100%);
+    color: #f1e7d6;
+}
+
+.libro-epilogo .libro-chapter-label {
+    color: #d9b98c;
+}
+
+.libro-epilogo .libro-chapter-title {
+    color: #f6efe4;
+    border-bottom-color: rgba(246, 239, 230, 0.25);
+}
+
+.libro-epilogo .libro-text p {
+    color: #ead9c1;
+}
+
+.libro-epilogo .libro-text p:first-of-type:first-letter {
+    color: #e0b27d;
+}
+
+.libro-epilogo .libro-image-slot {
+    border-color: rgba(246, 239, 230, 0.3);
+    background: linear-gradient(135deg, rgba(246, 239, 230, 0.06) 0%, rgba(246, 239, 230, 0.02) 100%);
+    color: #d9b98c;
+}
+
+.libro-continuara {
+    text-align: center;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-style: italic;
+    color: #e0b27d;
+    margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .libro-hero {
+        padding: 7rem 1.25rem 2rem;
+    }
+
+    .libro-chapter {
+        padding: 1.75rem 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+}
