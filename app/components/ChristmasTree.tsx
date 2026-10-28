@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Sparkles, Star } from "lucide-react";
 import PhotoFrame from "@/app/components/PhotoFrame";
 import LetterModal from "./LetterModal";
 
@@ -98,16 +99,21 @@ const ChristmasTree = () => {
 
     return (
         <>
-            <div className="flex flex-col items-center gap-4 py-8 relative">
+            <div className="relative flex w-full flex-col items-center gap-3 py-8 sm:gap-4">
                 {/* Estrella en la cima */}
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-5xl animate-twinkle z-20">
-                    ⭐
+                <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2 text-christmas-gold animate-twinkle sm:-top-4">
+                    <Star
+                        className="size-9 sm:size-11"
+                        fill="currentColor"
+                        strokeWidth={1}
+                        aria-hidden="true"
+                    />
                 </div>
 
                 {treeConfig.map((row, rowIndex) => (
                     <div
                         key={rowIndex}
-                        className="flex justify-center gap-3 md:gap-4"
+                        className="flex w-full justify-center gap-2 sm:gap-3 md:gap-4"
                         style={{
                             animationDelay: `${rowIndex * 100}ms`,
                         }}
@@ -117,7 +123,7 @@ const ChristmasTree = () => {
                             return (
                                 <div
                                     key={itemIndex}
-                                    className="w-28 sm:w-36 md:w-44 lg:w-52"
+                                    className="w-[clamp(3.5rem,17vw,13rem)]"
                                 >
                                     <PhotoFrame
                                         imageSrc={placeholderImages[currentImageIndex % placeholderImages.length]}
@@ -133,12 +139,18 @@ const ChristmasTree = () => {
                 ))}
 
                 {/* Tronco del árbol */}
-                <div className="mt-8 w-24 h-16 bg-gradient-to-b from-amber-800 to-amber-900 rounded-sm shadow-lg" />
+                <div className="mt-6 h-12 w-16 rounded-sm bg-gradient-to-b from-amber-800 to-amber-900 shadow-lg sm:mt-8 sm:h-16 sm:w-24" />
 
                 {/* Decoraciones adicionales */}
-                <div className="absolute left-1/4 top-1/4 text-2xl animate-sparkle" style={{ animationDelay: '0.5s' }}>✨</div>
-                <div className="absolute right-1/4 top-1/3 text-2xl animate-sparkle" style={{ animationDelay: '1s' }}>✨</div>
-                <div className="absolute left-1/3 bottom-1/4 text-2xl animate-sparkle" style={{ animationDelay: '1.5s' }}>✨</div>
+                <div className="pointer-events-none absolute left-1/4 top-1/4 text-christmas-gold/70 animate-sparkle" aria-hidden="true">
+                    <Sparkles className="size-5" />
+                </div>
+                <div className="pointer-events-none absolute right-1/4 top-1/3 text-christmas-gold/70 animate-sparkle" aria-hidden="true">
+                    <Sparkles className="size-4" />
+                </div>
+                <div className="pointer-events-none absolute bottom-1/4 left-1/3 text-christmas-gold/70 animate-sparkle" aria-hidden="true">
+                    <Sparkles className="size-5" />
+                </div>
             </div>
 
             <LetterModal

@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from "react"
-import { Image, Calendar, ArrowRight, Infinity as InfinityIcon } from "lucide-react"
+import { Image, Calendar, ArrowRight, Infinity as InfinityIcon, Music2 } from "lucide-react"
 import CrudTable from "../components/crud-table"
 import { fechasService } from "@/lib/services/fechasService"
 import { galeriaService } from "@/lib/services/galeriaService"
 import { timelineService } from "@/lib/services/timelineService"
+import { cancionesService } from "@/lib/services/cancionesService"
 
 const crudModules = [
   {
@@ -74,6 +75,31 @@ const crudModules = [
       { name: 'descripcion', label: 'Historia', type: 'textarea' },
     ],
   },
+  {
+    id: "canciones",
+    title: "Banda Sonora",
+    description: "Administra las canciones de Spotify y versos favoritos.",
+    icon: Music2,
+    theme: {
+      gradient: "from-emerald-500 to-teal-600",
+      bgLight: "bg-emerald-50",
+      text: "text-emerald-600",
+      border: "border-emerald-100",
+      shadow: "shadow-emerald-500/10",
+      iconColor: "text-emerald-500",
+      buttonGradient: "bg-gradient-to-r from-emerald-500 to-teal-600",
+    },
+    service: cancionesService,
+    addSchema: [
+      { name: 'titulo', label: 'Título', type: 'text' },
+      { name: 'artista', label: 'Artista', type: 'text' },
+      { name: 'spotifyUrl', label: 'Enlace Spotify', type: 'text' },
+      { name: 'fraseDestacada', label: 'Parte a Resaltar (Verso)', type: 'textarea' },
+      { name: 'momento', label: 'Minuto / Momento', type: 'text' },
+      { name: 'dedicatoria', label: 'Dedicatoria', type: 'textarea' },
+      { name: 'fecha', label: 'Fecha', type: 'date' },
+    ],
+  },
 ]
 
 export default function DashboardPage() {
@@ -90,37 +116,40 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-7xl mx-auto">
-        <div className="text-center mb-16 animate-fade-in-up">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-4 font-serif">
+    <div className="min-h-[100svh] bg-paper pb-20 pt-[var(--nav-offset)] text-ink">
+      <div className="page-container">
+        <header className="mb-10 pt-8 text-center sm:mb-14 sm:pt-12">
+          <h1 className="text-balance font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl md:text-5xl">
             Panel de Administración
           </h1>
-          <p className="text-slate-500 text-lg max-w-2xl mx-auto">
+          <p className="mx-auto mt-3 max-w-2xl text-base text-ink-muted sm:text-lg">
             Gestiona cada detalle de nuestra historia desde aquí.
           </p>
-        </div>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {crudModules.map((module) => {
             const Icon = module.icon
             return (
               <button
                 key={module.id}
+                type="button"
                 onClick={() => setSelectedModule(module.id)}
-                className="group text-left bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 hover:-translate-y-1"
+                className="group rounded-3xl border border-line bg-surface p-5 text-left shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg focus-visible:-translate-y-0.5 sm:p-7"
               >
-                <div className="flex items-start gap-6">
-                  <div className={`p-4 rounded-xl ${module.theme.bgLight} group-hover:scale-110 transition-transform duration-300 ${module.theme.shadow}`}>
-                    <Icon className={`h-8 w-8 ${module.theme.iconColor}`} />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className={`text-2xl font-bold ${module.theme.text} mb-2`}>{module.title}</h3>
-                    <p className="text-gray-600 leading-relaxed mb-4">{module.description}</p>
-                    <div className={`flex items-center font-medium ${module.theme.text} opacity-80 group-hover:opacity-100 transition-opacity`}>
-                      <span>Gestionar Contenido</span>
-                      <ArrowRight className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
-                    </div>
+                <div className="flex items-start gap-4 sm:gap-5">
+                  <span className={`grid size-12 shrink-0 place-items-center rounded-2xl ${module.theme.bgLight} ${module.theme.iconColor} sm:size-14`}>
+                    <Icon className="size-6 sm:size-7" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="mb-1.5 font-display text-lg font-bold leading-snug text-ink sm:text-xl">
+                      {module.title}
+                    </h2>
+                    <p className="text-sm leading-relaxed text-ink-muted">{module.description}</p>
+                    <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
+                      Gestionar contenido
+                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                    </span>
                   </div>
                 </div>
               </button>

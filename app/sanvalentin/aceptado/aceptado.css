@@ -1,12 +1,12 @@
 /* Aceptado Page Styles */
 
 .aceptado-page {
-    min-height: 100vh;
+    min-height: 100svh;
     background: linear-gradient(135deg, #ff6b9d 0%, #c44569 50%, #ff4757 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: calc(var(--nav-offset) + 1.5rem) 1.25rem 2.5rem;
     font-family: 'Georgia', 'Times New Roman', serif;
 }
 
@@ -19,20 +19,25 @@
 }
 
 .celebration-emoji {
-    font-size: 5rem;
-    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .aceptado-title {
-    font-size: 4rem;
+    font-size: clamp(2rem, 6vw, 4rem);
     font-weight: 700;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    line-height: 1.15;
 }
 
 .aceptado-message {
-    font-size: 2rem;
-    margin-bottom: 3rem;
+    font-size: clamp(1.15rem, 3vw, 2rem);
+    margin-bottom: 2rem;
     font-style: italic;
     opacity: 0.95;
 }

@@ -60,6 +60,23 @@ export default function FechasEspeciales() {
     fetchData();
   }, []);
 
+  // Detail modal: Escape to close and no page scroll behind it
+  useEffect(() => {
+    if (!fechaSeleccionada && !showForm) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setFechaSeleccionada(null);
+      setShowForm(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [fechaSeleccionada, showForm]);
+
   // Identify Hero Date
   const fechaPrincipal = fechas.find(f => f.fecha === TARGET_DATE);
   // Filter others
@@ -165,51 +182,63 @@ export default function FechasEspeciales() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-red-50 pb-20">
+    <div className="min-h-[100svh] bg-paper pb-20 text-ink">
 
-      {/* Admin Button */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Admin action — bottom-right so it never collides with the header */}
+      <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40">
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-rose-600 hover:bg-rose-700 text-white p-3 rounded-full shadow-lg transition-transform hover:scale-110"
-          title={showForm ? "Cerrar formulario" : "Agregar fecha"}
+          aria-label={showForm ? "Cerrar formulario" : "Agregar fecha"}
+          className="flex h-12 items-center gap-2 rounded-full bg-accent px-4 text-white shadow-soft transition-transform hover:scale-[1.03] active:scale-95 sm:px-5"
         >
-          {showForm ? <X className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
+          {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+          <span className="text-sm font-semibold">{showForm ? "Cerrar" : "Agregar"}</span>
         </button>
       </div>
 
       {/* ADMIN FORM OVERLAY or INLINE */}
       {showForm && (
-        <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white/95 rounded-3xl p-8 max-w-2xl w-full shadow-2xl relative my-8">
-            <h2 className="text-3xl font-bold text-rose-900 mb-6 font-serif">
-              {editingId ? "Editar Historia" : "Nueva Historia de Amor"}
-            </h2>
+        <div className="fixed inset-0 z-[70] overflow-y-auto overscroll-contain bg-black/50 backdrop-blur-sm">
+          <div className="flex min-h-full items-start justify-center p-4 sm:items-center">
+            <div className="relative my-2 w-full max-w-2xl rounded-3xl bg-surface p-5 shadow-2xl sm:my-8 sm:p-8">
+              <div className="mb-5 flex items-start justify-between gap-3 sm:mb-6">
+                <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">
+                  {editingId ? "Editar historia" : "Nueva historia de amor"}
+                </h2>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  aria-label="Cerrar formulario"
+                  className="grid size-10 shrink-0 place-items-center rounded-full text-ink-muted transition-colors hover:bg-paper hover:text-ink"
+                >
+                  <X className="size-5" aria-hidden="true" />
+                </button>
+              </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-rose-700 mb-1">Fecha</label>
+                  <label className="block text-sm font-medium text-ink-soft mb-1">Fecha</label>
                   <input
                     type="date"
                     required
                     value={formData.fecha}
                     onChange={e => setFormData({ ...formData, fecha: e.target.value })}
-                    className="w-full px-4 py-2 rounded-xl border-2 border-rose-100 focus:border-rose-400 focus:outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-line bg-surface focus:border-accent focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-rose-700 mb-1">Título</label>
+                  <label className="block text-sm font-medium text-ink-soft mb-1">Título</label>
                   <input
                     type="text"
                     required
                     placeholder="Ej: Nuestro primer beso"
                     value={formData.titulo}
                     onChange={e => setFormData({ ...formData, titulo: e.target.value })}
-                    className="w-full px-4 py-2 rounded-xl border-2 border-rose-100 focus:border-rose-400 focus:outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-line bg-surface focus:border-accent focus:outline-none"
                   />
                   {formData.fecha === TARGET_DATE && (
-                    <p className="text-xs text-amber-600 mt-1 font-semibold">✨ Esta será la fecha principal</p>
+                    <p className="mt-1 text-xs font-semibold text-amber-700">Esta será la fecha principal</p>
                   )}
                 </div>
               </div>
@@ -242,32 +271,32 @@ export default function FechasEspeciales() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-blue-700 mb-1">Perspectiva de Matías</label>
+                  <label className="block text-sm font-medium text-ink-soft mb-1">Perspectiva de Matías</label>
                   <textarea
                     rows={4}
                     value={formData.descripcion_m}
                     onChange={e => setFormData({ ...formData, descripcion_m: e.target.value })}
-                    className="w-full px-4 py-2 rounded-xl border-2 border-blue-100 focus:border-blue-400 focus:outline-none resize-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-blue-200 bg-surface focus:border-blue-400 focus:outline-none resize-none"
                     placeholder="Qué sentiste..."
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-pink-700 mb-1">Perspectiva de Danna</label>
+                  <label className="block text-sm font-medium text-ink-soft mb-1">Perspectiva de Danna</label>
                   <textarea
                     rows={4}
                     value={formData.descripcion_d}
                     onChange={e => setFormData({ ...formData, descripcion_d: e.target.value })}
-                    className="w-full px-4 py-2 rounded-xl border-2 border-pink-100 focus:border-pink-400 focus:outline-none resize-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-pink-200 bg-surface focus:border-pink-400 focus:outline-none resize-none"
                     placeholder="Qué viviste..."
                   />
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-4">
+              <div className="grid grid-cols-1 gap-3 pt-4 sm:grid-cols-2 sm:gap-4">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-semibold hover:bg-gray-50"
+                  className="min-h-12 rounded-xl border border-line px-4 font-semibold text-ink-soft transition-colors hover:bg-paper"
                   disabled={submitting}
                 >
                   Cancelar
@@ -275,7 +304,7 @@ export default function FechasEspeciales() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white py-3 rounded-xl font-bold hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                  className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-accent px-4 font-semibold text-white transition-colors hover:bg-accent/90 disabled:opacity-60"
                 >
                   {submitting ? (
                     <>
@@ -289,12 +318,13 @@ export default function FechasEspeciales() {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}
 
       {/* Hero Section - Fecha Principal */}
-      <div className="relative h-screen flex items-center justify-center overflow-hidden">
+      <div className="relative flex min-h-[100svh] items-center justify-center overflow-hidden pb-16 pt-[var(--nav-offset)] sm:pb-0">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0 bg-rose-900">
           {fechaPrincipal?.foto ? (
@@ -302,6 +332,7 @@ export default function FechasEspeciales() {
               src={fechaPrincipal.foto}
               alt={fechaPrincipal.titulo}
               fill
+              sizes="100vw"
               className="object-cover"
               priority
             />
@@ -339,30 +370,30 @@ export default function FechasEspeciales() {
             </div>
           ) : (
             <>
-              <div className="inline-block px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-rose-100 font-medium tracking-widest uppercase text-sm mb-6 animate-fade-in-up">
+              <div className="mb-5 inline-block rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium uppercase tracking-widest text-rose-100 backdrop-blur-md animate-fade-in-up sm:mb-6 sm:px-6 sm:text-sm">
                 Nuestra Gran Fecha
               </div>
 
-              <h1 className="text-5xl md:text-8xl font-bold text-white mb-8 font-serif drop-shadow-lg animate-fade-in-up delay-100">
+              <h1 className="mb-6 font-display text-4xl font-bold leading-tight text-white drop-shadow-lg animate-fade-in-up delay-100 sm:mb-8 sm:text-6xl md:text-8xl">
                 {fechaPrincipal ? fechaPrincipal.titulo : "Nuestro tiempo juntos"}
               </h1>
 
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/20 animate-fade-in-up delay-200 hover:bg-white/15 transition-colors">
+              <div className="rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-lg animate-fade-in-up delay-200 transition-colors hover:bg-white/15 sm:p-8 md:p-12">
                 <div className="text-center">
-                  <p className="text-2xl md:text-3xl text-rose-100 font-serif italic">
+                  <p className="font-display text-xl italic text-rose-100 sm:text-2xl md:text-3xl">
                     {fechaPrincipal ? formatearFecha(fechaPrincipal.fecha) : `${formatearFecha(TARGET_DATE)}`}
                   </p>
                 </div>
               </div>
 
               {fechaPrincipal && (
-                <div className="mt-12 animate-fade-in-up delay-300">
+                <div className="mt-8 animate-fade-in-up delay-300 sm:mt-12">
                   <button
                     onClick={() => setFechaSeleccionada(fechaPrincipal)}
-                    className="group bg-white text-rose-900 px-8 py-4 rounded-full font-bold text-lg hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] transition-all hover:scale-105 flex items-center gap-3 mx-auto"
+                    className="group mx-auto flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-base font-bold text-rose-900 transition-all hover:scale-[1.03] hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] sm:gap-3 sm:px-8 sm:py-4 sm:text-lg"
                   >
                     Ver Nuestros Mensajes
-                    <Heart className="w-5 h-5 text-rose-600 transition-transform group-hover:scale-125 fill-rose-600" />
+                    <Heart className="h-5 w-5 fill-rose-600 text-rose-600 transition-transform group-hover:scale-110" />
                   </button>
                 </div>
               )}
@@ -371,7 +402,7 @@ export default function FechasEspeciales() {
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce cursor-pointer" onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}>
+        <div className="absolute bottom-8 left-1/2 z-20 hidden -translate-x-1/2 cursor-pointer md:block" onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}>
           <div className="text-white/60 text-center">
             <div className="text-sm mb-2 font-medium tracking-widest uppercase">Historia</div>
             <div className="w-6 h-10 border-2 border-white/60 rounded-full mx-auto flex items-start justify-center p-2">
@@ -383,104 +414,118 @@ export default function FechasEspeciales() {
 
       {/* Otras Fechas - Timeline Romántico */}
       {otrasFechas.length > 0 && (
-        <div className="relative py-24 px-4">
+        <div className="relative px-4 py-16 sm:py-24">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-20">
-              <div className="inline-flex items-center justify-center gap-4 mb-4 px-8 py-2 rounded-full bg-rose-100/50 backdrop-blur-sm border border-rose-200">
-                <Heart className="w-6 h-6 text-rose-500 fill-rose-500" />
-                <h2 className="text-3xl md:text-4xl font-bold text-rose-900 font-serif">
+              <div className="mb-12 flex flex-wrap items-center justify-center gap-3 rounded-full border border-rose-200 bg-rose-100/50 px-4 py-2 backdrop-blur-sm sm:mb-20 sm:gap-4 sm:px-8">
+                <Heart className="w-5 h-5 fill-rose-500 text-rose-500 sm:w-6 sm:h-6" />
+                <h2 className="font-display text-2xl font-bold text-rose-900 sm:text-3xl md:text-4xl">
                   Momentos Inolvidables
                 </h2>
-                <Heart className="w-6 h-6 text-rose-500 fill-rose-500" />
+                <Heart className="w-5 h-5 fill-rose-500 text-rose-500 sm:w-6 sm:h-6" />
               </div>
             </div>
 
-            <div className="space-y-24">
+            <div className="space-y-12 md:space-y-24">
               {otrasFechas.map((fecha, index) => (
-                <div
+                <article
                   key={fecha.id}
-                  className={`flex flex-col md:flex-row gap-12 items-center ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                  className={`flex flex-col gap-6 md:flex-row md:items-center md:gap-12 ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
                     }`}
                 >
                   {/* Image Side */}
-                  <div className="w-full md:w-1/2 group perspective">
-                    <div
-                      className="relative h-[400px] rounded-[2rem] overflow-hidden shadow-2xl transform transition-all duration-700 hover:rotate-y-12 hover:scale-[1.02] cursor-pointer bg-white"
+                  <div className="group w-full md:w-1/2">
+                    <button
+                      type="button"
                       onClick={() => setFechaSeleccionada(fecha)}
+                      aria-label={`Ver la historia de ${fecha.titulo}`}
+                      className="relative block h-64 w-full overflow-hidden rounded-3xl bg-white shadow-xl transition-transform duration-500 hover:scale-[1.01] sm:h-80 md:h-[400px]"
                     >
                       {fecha.foto ? (
                         <Image
                           src={fecha.foto}
                           alt={fecha.titulo}
                           fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-rose-100">
-                          <Heart className="w-20 h-20 text-rose-300" />
-                        </div>
+                        <span className="flex h-full w-full items-center justify-center bg-rose-100">
+                          <Heart className="h-16 w-16 text-rose-300" aria-hidden="true" />
+                        </span>
                       )}
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 transition-opacity" />
+                      <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70" />
 
-                      <div className="absolute bottom-6 left-6 right-6 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                        <span className="text-white font-serif text-2xl">{formatearFecha(fecha.fecha)}</span>
-                      </div>
-                    </div>
+                      <span className="absolute inset-x-4 bottom-4 text-left font-display text-xl text-white sm:inset-x-6 sm:bottom-6 sm:text-2xl">
+                        {formatearFecha(fecha.fecha)}
+                      </span>
+                    </button>
                   </div>
 
                   {/* Content Side */}
                   <div className="w-full md:w-1/2">
-                    <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-[2rem] p-8 md:p-10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                      <div className="flex justify-between items-start mb-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center shadow-lg text-white transform rotate-3">
-                            <Calendar className="w-7 h-7" />
-                          </div>
-                          <h3 className="text-3xl font-bold text-rose-900 font-serif leading-tight">
+                    <div className="rounded-3xl border border-line bg-surface p-5 shadow-soft sm:p-8 md:p-10">
+                      <div className="mb-5 flex flex-wrap items-start justify-between gap-3 sm:mb-6">
+                        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent sm:size-14">
+                            <Calendar className="size-5 sm:size-7" aria-hidden="true" />
+                          </span>
+                          <h3 className="min-w-0 font-display text-xl font-bold leading-tight text-ink sm:text-2xl md:text-3xl">
                             {fecha.titulo}
                           </h3>
                         </div>
-                        <div className="flex gap-2">
-                          <button onClick={() => handleEdit(fecha)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors">
-                            <Edit2 className="w-5 h-5" />
+                        <div className="flex shrink-0 gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(fecha)}
+                            aria-label={`Editar ${fecha.titulo}`}
+                            title="Editar"
+                            className="grid size-10 place-items-center rounded-full text-ink-muted transition-colors hover:bg-accent-soft hover:text-accent"
+                          >
+                            <Edit2 className="size-5" aria-hidden="true" />
                           </button>
-                          <button onClick={() => handleDelete(fecha.id, fecha.imageRef)} className="p-2 text-rose-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
-                            <Trash2 className="w-5 h-5" />
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(fecha.id, fecha.imageRef)}
+                            aria-label={`Borrar ${fecha.titulo}`}
+                            title="Borrar"
+                            className="grid size-10 place-items-center rounded-full text-ink-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 className="size-5" aria-hidden="true" />
                           </button>
                         </div>
                       </div>
 
-                      <div className="space-y-6">
-                        <div className="relative pl-6 border-l-2 border-blue-200">
-                          <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-blue-400 ring-4 ring-white" />
-                          <h4 className="font-bold text-blue-900 mb-2 text-sm uppercase tracking-wider">Matías dice:</h4>
-                          <p className="text-gray-600 italic leading-relaxed line-clamp-3">
-                            "{fecha.descripcion_m}"
+                      <div className="space-y-5">
+                        <div className="relative border-l-2 border-blue-200 pl-4 sm:pl-6">
+                          <span className="absolute -left-[9px] top-0 size-4 rounded-full bg-blue-400 ring-4 ring-white" aria-hidden="true" />
+                          <h4 className="mb-1.5 text-xs font-bold uppercase tracking-wider text-blue-900">Matías dice:</h4>
+                          <p className="line-clamp-3 italic leading-relaxed text-ink-soft">
+                            &ldquo;{fecha.descripcion_m}&rdquo;
                           </p>
                         </div>
 
-                        <div className="relative pl-6 border-l-2 border-pink-200">
-                          <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-pink-400 ring-4 ring-white" />
-                          <h4 className="font-bold text-pink-900 mb-2 text-sm uppercase tracking-wider">Danna dice:</h4>
-                          <p className="text-gray-600 italic leading-relaxed line-clamp-3">
-                            "{fecha.descripcion_d}"
+                        <div className="relative border-l-2 border-pink-200 pl-4 sm:pl-6">
+                          <span className="absolute -left-[9px] top-0 size-4 rounded-full bg-pink-400 ring-4 ring-white" aria-hidden="true" />
+                          <h4 className="mb-1.5 text-xs font-bold uppercase tracking-wider text-pink-900">Danna dice:</h4>
+                          <p className="line-clamp-3 italic leading-relaxed text-ink-soft">
+                            &ldquo;{fecha.descripcion_d}&rdquo;
                           </p>
                         </div>
                       </div>
 
                       <button
+                        type="button"
                         onClick={() => setFechaSeleccionada(fecha)}
-                        className="mt-8 w-full group overflow-hidden relative bg-rose-50 hover:bg-rose-100 text-rose-600 px-6 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2"
+                        className="group mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent-soft px-5 font-semibold text-accent transition-colors hover:bg-accent hover:text-white sm:mt-8"
                       >
-                        <span className="relative z-10 flex items-center gap-2">
-                          Leer historia completa
-                          <Heart className="w-4 h-4 transition-transform group-hover:scale-125" />
-                        </span>
+                        Leer historia completa
+                        <Heart className="size-4 transition-transform group-hover:scale-110" aria-hidden="true" />
                       </button>
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           </div>
@@ -490,71 +535,80 @@ export default function FechasEspeciales() {
       {/* Modal de Detalles */}
       {fechaSeleccionada && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300"
+          className="fixed inset-0 z-[80] overflow-y-auto overscroll-contain bg-black/80 backdrop-blur-md"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="detalle-fecha-titulo"
           onClick={() => setFechaSeleccionada(null)}
         >
-          <div
-            className="bg-white rounded-[2.5rem] overflow-hidden max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in slide-in-from-bottom-10 duration-500"
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setFechaSeleccionada(null)}
-              className="absolute top-4 right-4 z-10 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors backdrop-blur-sm"
+          <div className="flex min-h-full items-start justify-center p-3 sm:items-center sm:p-4">
+            <div
+              className="relative my-2 w-full max-w-4xl overflow-hidden rounded-3xl bg-surface shadow-2xl sm:my-8 sm:rounded-[2.5rem]"
+              onClick={(e) => e.stopPropagation()}
             >
-              <X className="w-6 h-6" />
-            </button>
+              <button
+                type="button"
+                onClick={() => setFechaSeleccionada(null)}
+                aria-label="Cerrar"
+                className="absolute right-3 top-3 z-20 grid size-11 place-items-center rounded-full bg-black/30 text-white backdrop-blur-sm transition-colors hover:bg-black/50 sm:right-4 sm:top-4"
+              >
+                <X className="size-5" aria-hidden="true" />
+              </button>
 
-            {/* Header with Image */}
-            <div className="relative h-96 w-full">
-              {fechaSeleccionada.foto ? (
-                <Image
-                  src={fechaSeleccionada.foto}
-                  alt={fechaSeleccionada.titulo}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-rose-100" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-10">
-                <h2 className="text-5xl font-bold text-white font-serif mb-3 leading-tight">
-                  {fechaSeleccionada.titulo}
-                </h2>
-                <div className="flex items-center gap-3 text-rose-200">
-                  <Calendar className="w-5 h-5" />
-                  <span className="text-xl">{formatearFecha(fechaSeleccionada.fecha)}</span>
+              {/* Header with Image */}
+              <div className="relative h-56 w-full sm:h-80 md:h-96">
+                {fechaSeleccionada.foto ? (
+                  <Image
+                    src={fechaSeleccionada.foto}
+                    alt={fechaSeleccionada.titulo}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 896px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-rose-100" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5 pr-14 sm:p-8 md:p-10">
+                  <h2
+                    id="detalle-fecha-titulo"
+                    className="mb-2 font-display text-2xl font-bold leading-tight text-white sm:text-4xl md:text-5xl"
+                  >
+                    {fechaSeleccionada.titulo}
+                  </h2>
+                  <div className="flex items-center gap-2 text-sm text-rose-100 sm:gap-3 sm:text-base">
+                    <Calendar className="size-4 sm:size-5" aria-hidden="true" />
+                    <span>{formatearFecha(fechaSeleccionada.fecha)}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Content */}
-            <div className="p-10 md:p-12 bg-white">
-              <div className="grid md:grid-cols-2 gap-12">
+              {/* Content */}
+              <div className="grid gap-6 p-5 sm:gap-8 sm:p-8 md:grid-cols-2 md:gap-12 md:p-12">
                 {/* Perspectiva de Matías */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                      <span className="font-bold text-xl">M</span>
-                    </div>
-                    <div className="h-px flex-1 bg-blue-100" />
-                    <h3 className="text-sm font-bold text-blue-400 uppercase tracking-widest">Matías</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                      M
+                    </span>
+                    <span className="h-px flex-1 bg-blue-100" aria-hidden="true" />
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-blue-400">Matías</h3>
                   </div>
-                  <div className="bg-blue-50/50 rounded-2xl p-8 leading-loose text-gray-700 font-light text-lg whitespace-pre-wrap">
+                  <div className="whitespace-pre-wrap rounded-2xl bg-blue-50/60 p-5 text-base font-light leading-relaxed text-ink-soft sm:p-6 sm:text-lg sm:leading-loose">
                     {fechaSeleccionada.descripcion_m}
                   </div>
                 </div>
 
                 {/* Perspectiva de Danna */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-bold text-pink-400 uppercase tracking-widest">Danna</h3>
-                    <div className="h-px flex-1 bg-pink-100" />
-                    <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-600">
-                      <span className="font-bold text-xl">D</span>
-                    </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-pink-400">Danna</h3>
+                    <span className="h-px flex-1 bg-pink-100" aria-hidden="true" />
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-pink-100 text-sm font-bold text-pink-600">
+                      D
+                    </span>
                   </div>
-                  <div className="bg-pink-50/50 rounded-2xl p-8 leading-loose text-gray-700 font-light text-lg whitespace-pre-wrap">
+                  <div className="whitespace-pre-wrap rounded-2xl bg-pink-50/60 p-5 text-base font-light leading-relaxed text-ink-soft sm:p-6 sm:text-lg sm:leading-loose">
                     {fechaSeleccionada.descripcion_d}
                   </div>
                 </div>

@@ -18,7 +18,7 @@ export default function ExtrasPage() {
 
     const extras: ExtraCard[] = [
         {
-            title: "Navidad 🎄",
+            title: "Navidad",
             description: "Nuestra primera Navidad juntos llena de magia y amor",
             icon: <Gift className="w-8 h-8" />,
             href: "/navidad",
@@ -27,7 +27,7 @@ export default function ExtrasPage() {
             shadowColor: "shadow-red-200",
         },
         {
-            title: "Primer Aniversario 💕",
+            title: "Primer Aniversario",
             description: "Celebrando un año de amor, risas y momentos inolvidables",
             icon: <Heart className="w-8 h-8" />,
             href: "/aniversario",
@@ -36,7 +36,7 @@ export default function ExtrasPage() {
             shadowColor: "shadow-rose-200",
         },
         {
-            title: "San Valentín 2.0 ❤️",
+            title: "San Valentín 2.0",
             description: "Nuestro segundo San Valentín juntos y que sean muchos más",
             icon: <Heart className="w-8 h-8" />,
             href: "/sanvalentin",
@@ -45,7 +45,7 @@ export default function ExtrasPage() {
             shadowColor: "shadow-pink-200",
         },
         {
-            title: "Nuestra Historia 📖",
+            title: "Nuestra Historia",
             description: "Un libro con nuestra historia, capítulo a capítulo",
             icon: <BookOpen className="w-8 h-8" />,
             href: "/libro",
@@ -56,46 +56,47 @@ export default function ExtrasPage() {
     ];
 
     return (
-        <main className="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-blue-50">
-            <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-16 animate-fade-in-up">
-                    <div className="inline-flex items-center justify-center p-3 bg-white rounded-full shadow-md mb-6 animate-pulse">
-                        <Sparkles className="w-6 h-6 text-yellow-500" />
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-4 font-serif">
+        <main className="min-h-[100svh] bg-paper pb-24 pt-[var(--nav-offset)] text-ink">
+            <div className="page-container">
+                <header className="mb-10 pt-8 text-center sm:mb-14 sm:pt-12">
+                    <span className="mb-5 inline-grid size-12 place-items-center rounded-full bg-accent-soft text-accent">
+                        <Sparkles className="size-6" aria-hidden="true" />
+                    </span>
+                    <h1 className="text-balance font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl md:text-5xl">
                         Momentos Especiales
                     </h1>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto italic font-light">
-                        "Secciones dedicadas a celebrar nuestros momentos más mágicos"
+                    <p className="mx-auto mt-3 max-w-2xl font-display text-base italic text-ink-muted sm:text-lg">
+                        &ldquo;Secciones dedicadas a celebrar nuestros momentos más mágicos&rdquo;
                     </p>
-                </div>
+                </header>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {extras.map((extra, index) => (
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+                    {extras.map((extra) => (
                         <button
-                            key={index}
+                            key={extra.href}
+                            type="button"
                             onClick={() => router.push(extra.href)}
-                            className={`group relative overflow-hidden bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 text-left border border-slate-100 hover:-translate-y-2`}
+                            className="group relative overflow-hidden rounded-3xl border border-line bg-surface p-6 text-left shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg sm:p-7"
                         >
-                            <div className={`absolute inset-0 bg-gradient-to-br ${extra.gradient} opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
+                            <div className={`absolute inset-0 bg-gradient-to-br ${extra.gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-40`} />
 
-                            <div className="relative z-10 flex flex-col h-full">
-                                <div className={`inline-flex p-4 rounded-2xl bg-slate-50 group-hover:bg-white/80 group-hover:shadow-md transition-all duration-300 mb-6 ${extra.textColor}`}>
+                            <div className="relative z-10 flex h-full flex-col">
+                                <span className={`mb-5 inline-grid size-12 place-items-center rounded-2xl bg-paper ${extra.textColor} transition-colors group-hover:bg-white/80`}>
                                     {extra.icon}
-                                </div>
+                                </span>
 
-                                <h3 className="text-2xl font-bold text-slate-900 mb-3 font-serif group-hover:text-black transition-colors">
+                                <h2 className="mb-2 font-display text-xl font-bold text-ink sm:text-2xl">
                                     {extra.title}
-                                </h3>
+                                </h2>
 
-                                <p className="text-slate-600 mb-8 leading-relaxed">
+                                <p className="mb-6 text-sm leading-relaxed text-ink-muted sm:text-base">
                                     {extra.description}
                                 </p>
 
-                                <div className={`mt-auto flex items-center font-medium ${extra.textColor} opacity-80 group-hover:opacity-100`}>
-                                    <span className="mr-2">Ver Recuerdos</span>
-                                    <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
-                                </div>
+                                <span className={`mt-auto inline-flex items-center gap-1.5 text-sm font-semibold ${extra.textColor}`}>
+                                    Ver recuerdos
+                                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                                </span>
                             </div>
                         </button>
                     ))}

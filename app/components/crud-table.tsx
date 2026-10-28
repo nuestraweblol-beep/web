@@ -292,23 +292,42 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
     ? Object.keys(data[0]).filter((key) => !['id', 'userId', 'imageRef', 'fileSize', 'originalFileName', 'createdAt'].includes(key))
     : []
 
+  const fieldLabel = (key: string) =>
+    addSchema.find((field) => field.name === key)?.label ?? key.replace(/_/g, ' ')
+
+  const isImageColumn = (key: string) => key === 'imageUrl' || key === 'foto' || key === 'image'
+
+  const formatValue = (key: string, value: unknown) => {
+    if (value === null || value === undefined || value === '') return '—'
+    if (typeof value !== 'string') return String(value)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      const [y, m, d] = value.split('-').map(Number)
+      return new Date(y, m - 1, d).toLocaleDateString('es-ES', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    }
+    return value
+  }
+
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex items-center justify-center p-16 text-center">
-          <Loader className="h-10 w-10 animate-spin text-blue-500" />
-          <p className="ml-4 text-lg text-gray-500">Cargando contenido...</p>
+        <div className="flex items-center justify-center gap-3 py-20 text-center">
+          <Loader className="size-8 animate-spin text-accent" aria-hidden="true" />
+          <p className="text-ink-muted">Cargando contenido...</p>
         </div>
       )
     }
 
     if (error && !isAddModalOpen && !isEditModalOpen) {
       return (
-        <div className="flex items-center justify-center p-12 bg-red-50 border border-red-200 rounded-lg">
-          <AlertTriangle className="h-10 w-10 text-red-500" />
-          <div className="ml-4 text-left">
-            <h3 className="text-lg text-red-600 font-semibold">Ocurrió un error</h3>
-            <p className="text-gray-600">{error}</p>
+        <div className="flex flex-col items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-6 sm:flex-row sm:items-center">
+          <AlertTriangle className="size-8 shrink-0 text-red-500" aria-hidden="true" />
+          <div>
+            <h3 className="font-semibold text-red-700">Ocurrió un error</h3>
+            <p className="text-sm text-ink-soft">{error}</p>
           </div>
         </div>
       )
@@ -316,123 +335,235 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
 
     if (data.length === 0) {
       return (
-        <div className="text-center p-16 border-2 border-dashed border-gray-300 rounded-lg">
-          <p className="text-xl text-gray-500">No hay registros para mostrar.</p>
-          <p className="text-gray-400 mt-2">Puedes empezar añadiendo un nuevo registro.</p>
+        <div className="rounded-2xl border border-dashed border-line bg-surface/60 px-6 py-16 text-center">
+          <p className="font-display text-xl text-ink">No hay registros para mostrar.</p>
+          <p className="mt-2 text-sm text-ink-muted">Puedes empezar añadiendo un nuevo registro.</p>
         </div>
       )
     }
 
     return (
-      <div className="border border-gray-200/80 rounded-lg overflow-hidden shadow-sm">
-        <div className="overflow-x-auto relative">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr className="border-b border-gray-200">
-                <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                {columns.map((column) => (
-                  <th key={column} className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
-                    {column}
-                  </th>
-                ))}
-                <th className="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {data.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50 transition-colors duration-200">
-                  <td className="px-6 py-4 whitespace-nowrap font-mono text-gray-500">#{row.id?.substring(0, 8)}</td>
-                  {columns.map((column) => {
-                    const cellValue = row[column]
-                    // Handle image fields (imageUrl or foto)
-                    if ((column === 'imageUrl' || column === 'foto') && typeof cellValue === 'string') {
+      <>
+        {/* Mobile: cards */}
+        <div className="space-y-3 md:hidden">
+          {data.map((row) => {
+            const imageColumn = columns.find(isImageColumn)
+            const imageValue = imageColumn ? row[imageColumn] : null
+            const textColumns = columns.filter((column) => column !== imageColumn)
+
+            return (
+              <article key={row.id} className="rounded-2xl border border-line bg-surface p-4 shadow-soft">
+                <div className="flex items-start gap-3">
+                  {typeof imageValue === 'string' && imageValue && (
+                    <img
+                      src={imageValue}
+                      alt={row.titulo || 'Imagen'}
+                      className="size-16 shrink-0 rounded-xl object-cover"
+                      loading="lazy"
+                    />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-display text-lg font-semibold text-ink">
+                      {row.titulo || formatValue(textColumns[0], row[textColumns[0]])}
+                    </p>
+                    <p className="mt-0.5 font-mono text-xs text-ink-muted">#{row.id?.substring(0, 8)}</p>
+                  </div>
+                </div>
+
+                <dl className="mt-3 space-y-2">
+                  {textColumns.slice(0, 5).map((column) => (
+                    <div key={column} className="flex gap-2 text-sm">
+                      <dt className="w-24 shrink-0 capitalize text-ink-muted">{fieldLabel(column)}</dt>
+                      <dd className="min-w-0 flex-1 break-words text-ink-soft">
+                        {formatValue(column, row[column])}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleViewClick(row)}
+                    aria-label="Ver detalles"
+                    className="flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-blue-50 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-100"
+                  >
+                    <Eye className="size-4" aria-hidden="true" />
+                    Ver
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleEditClick(row)}
+                    aria-label="Editar"
+                    className="flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-amber-50 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-100"
+                  >
+                    <Pencil className="size-4" aria-hidden="true" />
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(row)}
+                    aria-label="Eliminar"
+                    className="flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-red-50 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100"
+                  >
+                    <Trash2 className="size-4" aria-hidden="true" />
+                    Borrar
+                  </button>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden overflow-hidden rounded-2xl border border-line bg-surface shadow-soft md:block">
+          <div className="relative overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-paper">
+                <tr className="border-b border-line">
+                  <th scope="col" className="px-5 py-3 text-left font-medium uppercase tracking-wider text-ink-muted">ID</th>
+                  {columns.map((column) => (
+                    <th key={column} scope="col" className="px-5 py-3 text-left font-medium uppercase tracking-wider text-ink-muted">
+                      {fieldLabel(column)}
+                    </th>
+                  ))}
+                  <th scope="col" className="sticky right-0 bg-paper px-5 py-3 text-right font-medium uppercase tracking-wider text-ink-muted">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {data.map((row) => (
+                  <tr key={row.id} className="transition-colors hover:bg-paper/60">
+                    <td className="whitespace-nowrap px-5 py-3 font-mono text-xs text-ink-muted">#{row.id?.substring(0, 8)}</td>
+                    {columns.map((column) => {
+                      const cellValue = row[column]
+                      if (isImageColumn(column) && typeof cellValue === 'string') {
+                        return (
+                          <td key={column} className="whitespace-nowrap px-5 py-3">
+                            {cellValue ? (
+                              <img src={cellValue} alt={row.titulo || 'Imagen'} className="h-10 w-14 rounded-md object-cover" loading="lazy" />
+                            ) : (
+                              <span className="text-xs italic text-ink-muted">Sin imagen</span>
+                            )}
+                          </td>
+                        )
+                      }
                       return (
-                        <td key={column} className="px-6 py-4 whitespace-nowrap">
-                          {cellValue ? (
-                            <img src={cellValue} alt={row.titulo || 'Imagen'} className="h-10 w-14 rounded-md object-cover" />
-                          ) : (
-                            <span className="text-gray-400 text-xs italic">Sin imagen</span>
-                          )}
+                        <td key={column} className="max-w-xs px-5 py-3 text-ink-soft">
+                          <span className="line-clamp-2">{formatValue(column, cellValue)}</span>
                         </td>
                       )
-                    }
-                    return (
-                      <td key={column} className="px-6 py-4 max-w-xs whitespace-nowrap overflow-hidden text-ellipsis text-gray-700">
-                        {typeof cellValue === 'string' ? cellValue : String(cellValue)}
-                      </td>
-                    )
-                  })}
-                  <td className="px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-white">
-                    <div className="flex items-center justify-end gap-3">
-                      <button
-                        onClick={() => handleViewClick(row)}
-                        className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:shadow-md transition-all duration-200"
-                        title="Ver detalles"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleEditClick(row)}
-                        className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 hover:shadow-md transition-all duration-200"
-                        title="Editar"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(row)}
-                        className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:shadow-md transition-all duration-200"
-                        title="Eliminar"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    })}
+                    <td className="sticky right-0 whitespace-nowrap bg-surface px-5 py-3 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleViewClick(row)}
+                          aria-label="Ver detalles"
+                          title="Ver detalles"
+                          className="grid size-9 place-items-center rounded-lg bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
+                        >
+                          <Eye className="size-4" aria-hidden="true" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleEditClick(row)}
+                          aria-label="Editar"
+                          title="Editar"
+                          className="grid size-9 place-items-center rounded-lg bg-amber-50 text-amber-600 transition-colors hover:bg-amber-100"
+                        >
+                          <Pencil className="size-4" aria-hidden="true" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(row)}
+                          aria-label="Eliminar"
+                          title="Eliminar"
+                          className="grid size-9 place-items-center rounded-lg bg-red-50 text-red-600 transition-colors hover:bg-red-100"
+                        >
+                          <Trash2 className="size-4" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
+  // Modals: lock page scroll and close with Escape
+  useEffect(() => {
+    if (!isAddModalOpen && !isEditModalOpen && !isViewModalOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const closeAll = () => {
+      setIsAddModalOpen(false)
+      setIsEditModalOpen(false)
+      setIsViewModalOpen(false)
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeAll()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [isAddModalOpen, isEditModalOpen, isViewModalOpen])
+
   const renderModal = (title: string, onClose: () => void, onSubmit: (e: FormEvent) => void, content: React.ReactNode, footer: React.ReactNode) => (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md text-gray-800">
-        <form onSubmit={onSubmit}>
-          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-            <h3 className="text-xl font-semibold">{title}</h3>
-            <button type="button" onClick={onClose} className="p-2 rounded-full hover:bg-gray-100">
-              <X className="h-5 w-5 text-gray-500" />
-            </button>
-          </div>
-          <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">{content}</div>
-          <div className="p-4 bg-gray-50 rounded-b-lg flex justify-end gap-3">{footer}</div>
-        </form>
+    <div className="fixed inset-0 z-[80] overflow-y-auto overscroll-contain bg-black/50 backdrop-blur-sm">
+      <div className="flex min-h-full items-start justify-center p-3 sm:items-center sm:p-4">
+        <div className="my-2 w-full max-w-lg overflow-hidden rounded-2xl bg-surface text-ink shadow-2xl sm:my-8">
+          <form onSubmit={onSubmit}>
+            <div className="flex items-center justify-between gap-3 border-b border-line p-4 sm:p-5">
+              <h3 className="min-w-0 truncate font-display text-lg font-semibold sm:text-xl">{title}</h3>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Cerrar"
+                className="grid size-10 shrink-0 place-items-center rounded-full text-ink-muted transition-colors hover:bg-paper hover:text-ink"
+              >
+                <X className="size-5" aria-hidden="true" />
+              </button>
+            </div>
+            <div className="max-h-[65svh] space-y-4 overflow-y-auto overscroll-contain p-4 sm:p-5">{content}</div>
+            <div className="flex flex-wrap justify-end gap-2 border-t border-line bg-paper/60 p-4">{footer}</div>
+          </form>
+        </div>
       </div>
     </div>
   );
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 text-gray-800">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-8">
-          <header className="flex flex-wrap items-center justify-between gap-4 mb-8">
-            <div className="flex items-center gap-4">
-              <button onClick={onBack} className="p-2 rounded-full hover:bg-gray-200 transition-colors">
-                <ArrowLeft className="h-6 w-6 text-gray-600" />
+      <div className="min-h-[100svh] bg-paper pt-[var(--nav-offset)] text-ink">
+        <div className="page-container pb-16">
+          <header className="mb-6 flex flex-wrap items-center justify-between gap-3 sm:mb-8">
+            <div className="flex min-w-0 items-center gap-3">
+              <button
+                type="button"
+                onClick={onBack}
+                aria-label="Volver al panel"
+                className="grid size-10 shrink-0 place-items-center rounded-full text-ink-soft transition-colors hover:bg-surface hover:text-ink"
+              >
+                <ArrowLeft className="size-5" aria-hidden="true" />
               </button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">{module.title}</h1>
-                <p className="text-gray-500 mt-1">{module.description}</p>
+              <div className="min-w-0">
+                <h1 className="text-balance font-display text-2xl font-bold text-ink sm:text-3xl">{module.title}</h1>
+                <p className="mt-0.5 text-sm text-ink-muted">{module.description}</p>
               </div>
             </div>
             <button
+              type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className={`px-5 py-2.5 ${module.theme.buttonGradient} text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center gap-2 font-bold shadow-md`}
+              className="flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-accent/90"
             >
-              <Plus className="h-5 w-5" />
-              Añadir Registro
+              <Plus className="size-4" aria-hidden="true" />
+              Añadir registro
             </button>
           </header>
           {renderContent()}
@@ -446,14 +577,14 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
         <>
           {addSchema.map((field) => (
             <div key={field.name}>
-              <label htmlFor={field.name} className="block text-sm font-medium text-gray-600 mb-1.5">{field.label}</label>
+              <label htmlFor={field.name} className="mb-1.5 block text-sm font-medium text-ink-soft">{field.label}</label>
               {field.type === 'textarea' ? (
                 <textarea
                   id={field.name}
                   name={field.name}
                   rows={4}
                   onChange={(e: any) => handleAddInputChange(e)}
-                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+                  className="w-full rounded-lg border border-line bg-surface px-3 py-2.5 transition-colors focus:border-accent focus:outline-none resize-none"
                 />
               ) : (
                 <input
@@ -462,7 +593,7 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
                   name={field.name}
                   accept={field.type === 'file' ? 'image/*' : undefined}
                   onChange={handleAddInputChange}
-                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  className="w-full rounded-lg border border-line bg-surface px-3 py-2.5 transition-colors focus:border-accent focus:outline-none"
                 />
               )}
             </div>
@@ -475,8 +606,8 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
           )}
         </>,
         <>
-          <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors font-semibold text-gray-700">Cancelar</button>
-          <button type="submit" disabled={isSubmitting} className={`px-4 py-2 rounded-md ${module.theme.buttonGradient} text-white font-semibold flex items-center gap-2 disabled:opacity-50 hover:shadow-lg transition-all`}>
+          <button type="button" onClick={() => setIsAddModalOpen(false)} className="min-h-11 flex-1 rounded-lg border border-line px-4 font-semibold text-ink-soft transition-colors hover:bg-paper sm:flex-none">Cancelar</button>
+          <button type="submit" disabled={isSubmitting} className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-accent px-4 font-semibold text-white transition-colors hover:bg-accent/90 disabled:opacity-50 sm:flex-none">
             {isSubmitting && <Loader className="h-4 w-4 animate-spin" />}
             {isSubmitting ? 'Guardando...' : 'Guardar'}
           </button>
@@ -494,13 +625,13 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
             if (col === 'imageUrl' || col === 'foto') {
               return (
                 <div key={col}>
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5 capitalize">{col}</label>
+                  <label className="mb-1.5 block text-sm font-medium capitalize text-ink-soft">{col}</label>
                   {cellValue ? (
                     <img src={cellValue} alt={editingRecord.titulo || 'Imagen'} className="h-20 w-20 rounded-md object-cover" />
                   ) : (
-                    <p className="text-xs text-gray-400 italic">Sin imagen asignada</p>
+                    <p className="text-xs italic text-ink-muted">Sin imagen asignada</p>
                   )}
-                  <p className="text-xs text-gray-500 mt-2">La imagen no se puede editar desde aquí.</p>
+                  <p className="mt-2 text-xs text-ink-muted">La imagen no se puede editar desde aquí.</p>
                 </div>
               )
             }
@@ -511,7 +642,7 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
 
             return (
               <div key={col}>
-                <label htmlFor={col} className="block text-sm font-medium text-gray-600 mb-1.5 capitalize">{col}</label>
+                <label htmlFor={col} className="mb-1.5 block text-sm font-medium capitalize text-ink-soft">{col}</label>
                 {inputType === 'textarea' ? (
                   <textarea
                     id={col}
@@ -520,7 +651,7 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
                     value={cellValue || ''}
                     onChange={(e: any) => handleEditInputChange(e)}
                     required
-                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+                    className="w-full rounded-lg border border-line bg-surface px-3 py-2.5 transition-colors focus:border-accent focus:outline-none resize-none"
                   />
                 ) : (
                   <input
@@ -530,7 +661,7 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
                     value={cellValue || ''}
                     onChange={handleEditInputChange}
                     required
-                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-full rounded-lg border border-line bg-surface px-3 py-2.5 transition-colors focus:border-accent focus:outline-none"
                   />
                 )}
               </div>
@@ -539,8 +670,8 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
           {error && <p className="text-red-500 text-sm">{error}</p>}
         </>,
         <>
-          <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors font-semibold text-gray-700">Cancelar</button>
-          <button type="submit" disabled={isSubmitting} className={`px-4 py-2 rounded-md ${module.theme.buttonGradient} text-white font-semibold flex items-center gap-2 disabled:opacity-50 hover:shadow-lg transition-all`}>
+          <button type="button" onClick={() => setIsEditModalOpen(false)} className="min-h-11 flex-1 rounded-lg border border-line px-4 font-semibold text-ink-soft transition-colors hover:bg-paper sm:flex-none">Cancelar</button>
+          <button type="submit" disabled={isSubmitting} className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-accent px-4 font-semibold text-white transition-colors hover:bg-accent/90 disabled:opacity-50 sm:flex-none">
             {isSubmitting && <Loader className="h-4 w-4 animate-spin" />}
             {isSubmitting ? 'Actualizando...' : 'Actualizar'}
           </button>
@@ -553,11 +684,15 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
         (e) => e.preventDefault(),
         <>
           {Object.entries(viewingRecord).map(([key, value]) => {
-            if ((key === 'imageUrl' || key === 'foto') && typeof value === 'string') {
+            if (isImageColumn(key) && typeof value === 'string') {
               return (
                 <div key={key}>
-                  <h4 className="text-sm font-medium text-gray-500 capitalize">{key}</h4>
-                  <img src={value} alt={viewingRecord.titulo || 'Imagen'} className="mt-1 rounded-lg max-h-60 w-auto" />
+                  <h4 className="text-sm font-medium capitalize text-ink-muted">{fieldLabel(key)}</h4>
+                  {value ? (
+                    <img src={value} alt={viewingRecord.titulo || 'Imagen'} className="mt-2 max-h-60 w-full rounded-lg object-contain" />
+                  ) : (
+                    <p className="text-sm italic text-ink-muted">Sin imagen</p>
+                  )}
                 </div>
               )
             }
@@ -566,13 +701,15 @@ export default function CrudTable({ module, onBack, service, addSchema }: CrudTa
             }
             return (
               <div key={key}>
-                <h4 className="text-sm font-medium text-gray-500 capitalize">{key}</h4>
-                <p className="text-base text-gray-800">{String(value)}</p>
+                <h4 className="text-sm font-medium capitalize text-ink-muted">{fieldLabel(key)}</h4>
+                <p className="mt-0.5 whitespace-pre-wrap break-words text-base text-ink">
+                  {formatValue(key, value)}
+                </p>
               </div>
             )
           })}
         </>,
-        <button type="button" onClick={() => setIsViewModalOpen(false)} className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 transition-colors font-semibold text-gray-700">Cerrar</button>
+        <button type="button" onClick={() => setIsViewModalOpen(false)} className="min-h-11 w-full rounded-lg bg-accent px-5 font-semibold text-white transition-colors hover:bg-accent/90 sm:w-auto">Cerrar</button>
       )}
     </>
   )

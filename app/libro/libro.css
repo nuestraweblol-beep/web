@@ -2,11 +2,12 @@
 
 .libro-page {
     background: linear-gradient(180deg, #f6efe4 0%, #efe4d4 45%, #f6efe4 100%);
-    min-height: 100vh;
+    min-height: 100svh;
     font-family: 'Georgia', 'Times New Roman', serif;
     color: #4a3f35;
     position: relative;
     overflow-x: hidden;
+    padding-top: var(--nav-offset);
 }
 
 .libro-page * {
@@ -25,11 +26,11 @@
 
 /* Hero / Cover */
 .libro-hero {
-    min-height: 60vh;
+    min-height: 42svh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 9rem 2rem 3rem;
+    padding: 2.5rem 2rem 2rem;
     position: relative;
     z-index: 1;
     text-align: center;
@@ -191,8 +192,9 @@
 /* Interactive book stage: one page visible at a time, flipping like a real book */
 .libro-stage {
     position: relative;
-    height: clamp(800px, 96vh, 1450px);
+    height: clamp(440px, calc(100svh - var(--nav-offset) - 9rem), 720px);
     perspective: 2400px;
+    margin-bottom: 0.5rem;
 }
 
 .libro-leaf {
@@ -215,9 +217,12 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     padding-right: 0.75rem;
     scrollbar-width: thin;
     scrollbar-color: #c48b5a transparent;
+    scroll-behavior: smooth;
 }
 
 .libro-leaf .libro-chapter-label {
@@ -286,43 +291,57 @@
     box-shadow: 20px 0 40px rgba(74, 63, 53, 0.3);
 }
 
-/* Click zones on page edges to turn pages */
+/* Page-turn controls: floating round buttons, never covering the text */
 .libro-edge {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 14%;
-    z-index: 3;
-    border: none;
-    background: none;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2.75rem;
+    height: 2.75rem;
+    z-index: 4;
+    border: 1px solid rgba(196, 139, 90, 0.3);
+    border-radius: 9999px;
+    background: rgba(255, 253, 248, 0.92);
+    color: #a8703f;
     display: flex;
     align-items: center;
-    color: #b58657;
+    justify-content: center;
+    box-shadow: 0 6px 16px -8px rgba(92, 70, 50, 0.35);
     opacity: 0;
     cursor: pointer;
-    transition: opacity 0.25s ease, background 0.25s ease;
+    transition: opacity 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
-.libro-edge:hover:not(:disabled) {
+.libro-edge:hover:not(:disabled),
+.libro-edge:focus-visible {
     opacity: 1;
+    background: #fffdf8;
+    transform: translateY(-50%) scale(1.05);
 }
 
 .libro-edge:disabled {
+    opacity: 0;
+    pointer-events: none;
     cursor: default;
 }
 
 .libro-edge-left {
-    left: 0;
-    justify-content: flex-start;
-    padding-left: 0.5rem;
-    background: linear-gradient(90deg, rgba(196, 139, 90, 0.12), transparent);
+    left: 0.5rem;
 }
 
 .libro-edge-right {
-    right: 0;
-    justify-content: flex-end;
-    padding-right: 0.5rem;
-    background: linear-gradient(270deg, rgba(196, 139, 90, 0.12), transparent);
+    right: 0.5rem;
+}
+
+/* Touch devices have no hover: keep the page-turn controls visible */
+@media (hover: none) {
+    .libro-edge {
+        opacity: 0.85;
+    }
+
+    .libro-edge:disabled {
+        opacity: 0;
+    }
 }
 
 /* Prev/next controls + page counter, below the stage */
@@ -369,11 +388,36 @@
 
 @media (max-width: 640px) {
     .libro-stage {
-        height: clamp(520px, 78vh, 760px);
+        height: clamp(420px, calc(100svh - var(--nav-offset) - 11rem), 620px);
+    }
+
+    .libro-leaf .libro-chapter {
+        padding: 1.1rem 1.15rem;
+    }
+
+    .libro-leaf .libro-chapter-title {
+        font-size: 1.35rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.6rem;
+    }
+
+    .libro-leaf .libro-text p {
+        font-size: 0.98rem;
+        line-height: 1.75;
+        text-align: left;
     }
 
     .libro-edge {
-        width: 10%;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .libro-edge-left {
+        left: 0.25rem;
+    }
+
+    .libro-edge-right {
+        right: 0.25rem;
     }
 }
 
@@ -441,11 +485,29 @@
 /* Responsive */
 @media (max-width: 640px) {
     .libro-hero {
-        padding: 7rem 1.25rem 2rem;
+        min-height: 0;
+        padding: 1.75rem 1.25rem 1.5rem;
+    }
+
+    .libro-title {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .libro-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .libro-divider-top {
+        margin-top: 1.25rem;
     }
 
     .libro-chapter {
         padding: 1.75rem 1.25rem;
         margin-bottom: 2.5rem;
+    }
+
+    .libro-book {
+        padding: 0 0.75rem 4rem;
     }
 }

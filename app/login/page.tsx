@@ -1,15 +1,88 @@
 "use client";
+
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Heart, Sparkles, ArrowRight } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Heart, Lock, Mail, Sparkles } from "lucide-react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
-const Login = () => {
+interface MemoryItem {
+  type: "image" | "quote";
+  src?: string;
+  alt?: string;
+  text?: string;
+  subtext?: string;
+}
+
+const PHOTO_COLUMNS: MemoryItem[][] = [
+  // Columna 1
+  [
+    { type: "image", src: "/img/login1.jpg", alt: "Recuerdo juntos" },
+    { type: "image", src: "/img/lugar.jpeg", alt: "Nuestro lugar especial" },
+    {
+      type: "quote",
+      text: "Amo cada instante a tu lado",
+      subtext: "Momentos inolvidables",
+    },
+    { type: "image", src: "/img/sanvalentin1.jpg", alt: "San Valentín" },
+    { type: "image", src: "/img/ani.jpeg", alt: "Primer aniversario" },
+  ],
+  // Columna 2
+  [
+    { type: "image", src: "/img/fondo_login.jpg", alt: "Paseo bajo el atardecer" },
+    { type: "image", src: "/img/login2.jpg", alt: "Risas compartidas" },
+    { type: "image", src: "/img/anillo.jpeg", alt: "Promesa de amor" },
+    {
+      type: "quote",
+      text: "Tú y yo, siempre",
+      subtext: "Nuestra pequeña promesa",
+    },
+    { type: "image", src: "/img/sanvalentin2.jpg", alt: "San Valentín juntos" },
+  ],
+  // Columna 3
+  [
+    { type: "image", src: "/img/noche.jpeg", alt: "Noche bajo las estrellas" },
+    {
+      type: "quote",
+      text: "Donde comenzó todo",
+      subtext: "El primer capítulo",
+    },
+    { type: "image", src: "/img/login3.jpg", alt: "Aventuras juntos" },
+    { type: "image", src: "/img/vestido.jpeg", alt: "Un día inolvidable" },
+    { type: "image", src: "/img/sanvalentin3.jpg", alt: "San Valentín especial" },
+  ],
+  // Columna 4 (visible en pantallas medianas+)
+  [
+    { type: "image", src: "/img/sanvalentin4.jpg", alt: "San Valentín" },
+    { type: "image", src: "/img/diciembre.jpg", alt: "Diciembre mágico" },
+    {
+      type: "quote",
+      text: "La mejor casualidad de mi vida",
+      subtext: "Te amo",
+    },
+    { type: "image", src: "/img/julio.jpg", alt: "Tardes de julio" },
+    { type: "image", src: "/img/febrero.jpg", alt: "Febrero inolvidable" },
+  ],
+  // Columna 5 (visible en pantallas grandes)
+  [
+    { type: "image", src: "/img/octubre.jpg", alt: "Octubre juntos" },
+    { type: "image", src: "/img/arbol1.jpeg", alt: "Nuestra Navidad" },
+    { type: "image", src: "/img/img_carta2.jpg", alt: "Carta de amor" },
+    {
+      type: "quote",
+      text: "Un pequeño universo para dos",
+      subtext: "Nuestra Historia",
+    },
+    { type: "image", src: "/img/mayo.jpg", alt: "Primavera en mayo" },
+  ],
+];
+
+export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string>("");
 
@@ -35,10 +108,14 @@ const Login = () => {
       router.push("/galeria");
     } catch (error: any) {
       console.error("Login Error:", error);
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+      if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password"
+      ) {
         setLoginError("Credenciales incorrectas. Intenta de nuevo.");
-      } else if (error.code === 'auth/too-many-requests') {
-        setLoginError("Demasiados intentos. Espera un momento.");
+      } else if (error.code === "auth/too-many-requests") {
+        setLoginError("Demasiados intentos. Espera unos momentos.");
       } else {
         setLoginError("Ocurrió un error al iniciar sesión.");
       }
@@ -48,142 +125,236 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#0a0a0a] overflow-hidden">
-      {/* Background Ambient Gradients (Global) */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-rose-500/20 rounded-full blur-[120px] animate-pulse" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-500/20 rounded-full blur-[120px] animate-pulse delay-700" />
+    <main className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden bg-[#09080c]">
+      {/* ============================================================
+          FONDO INFINITO DE RECUERDOS (Animated Photo Wall)
+          ============================================================ */}
+      <div
+        className="pointer-events-none absolute -inset-24 select-none opacity-45 sm:opacity-50"
+        aria-hidden="true"
+      >
+        <div className="flex h-[140%] w-[120%] -translate-x-[10%] -translate-y-[10%] rotate-[-4deg] justify-center gap-4 sm:gap-6">
+          {PHOTO_COLUMNS.map((column, colIdx) => {
+            // Animación alternada: pares suben, impares bajan
+            const isUp = colIdx % 2 === 0;
+            const animClass = isUp ? "animate-marquee-up" : "animate-marquee-down";
+            const duration = `${48 + colIdx * 7}s`;
 
-      {/* Left Side - Memory Wall (Desktop 60%) */}
-      {/* Keeping the masonry layout user liked but integrating it into the dark/glass theme */}
-      <div className="lg:w-[60%] relative h-[400px] lg:h-auto overflow-hidden flex items-center justify-center perspective-1000">
+            // Ocultar columnas 3 y 4 en pantallas pequeñas para optimizar rendimiento móvil
+            const visibilityClass =
+              colIdx === 3 ? "hidden sm:flex" : colIdx === 4 ? "hidden lg:flex" : "flex";
 
-        {/* Floating Particles Overlay */}
-        <div className="absolute inset-0 z-10 bg-[url('/img/noise.png')] opacity-[0.03] animate-grain pointer-events-none" />
+            // Duplicar el array para bucle continuo e imperceptible
+            const loopedItems = [...column, ...column];
 
-        {/* Masonry Grid */}
-        <div className="grid grid-cols-3 gap-6 w-full max-w-5xl p-8 rotate-[-6deg] lg:scale-110 opacity-80 hover:opacity-100 hover:rotate-0 hover:scale-100 transition-all duration-[1.5s] ease-out-expo">
-
-          {/* Cards with Glass Borders */}
-          {/* Item 1 */}
-          <div className="relative h-64 lg:h-80 rounded-3xl overflow-hidden shadow-2xl shadow-rose-900/20 border border-white/10 backdrop-blur-sm group transform translate-y-12">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <Image src="/img/login1.jpg" alt="Recuerdo" fill className="object-cover group-hover:scale-110 transition-transform duration-[2s]" />
-          </div>
-
-          {/* Item 2 - Text Card */}
-          <div className="relative h-48 lg:h-60 rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-white/5 backdrop-blur-md flex flex-col items-center justify-center transform -translate-y-8 group hover:bg-white/10 transition-colors">
-            <Heart className="w-10 h-10 text-rose-400 mb-3 drop-shadow-glow animate-heartbeat" />
-            <p className="text-white/80 font-serif italic text-center px-4">"Amo nuestros momentos juntos"</p>
-          </div>
-
-          {/* Item 3 */}
-          <div className="relative h-72 lg:h-96 rounded-3xl overflow-hidden shadow-2xl border border-white/10 transform translate-y-20">
-            <Image src="/img/login2.jpg" alt="Recuerdo" fill className="object-cover grayscale hover:grayscale-0 transition-all duration-[1.5s]" />
-          </div>
-
-          {/* Item 4 */}
-          <div className="relative h-56 lg:h-72 rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-gradient-to-br from-rose-500/10 to-purple-500/10 backdrop-blur-md flex items-center justify-center transform rotate-3 hover:rotate-0 transition-all duration-700">
-            <div className="text-center">
-              <span className="text-5xl drop-shadow-lg">✨</span>
-              <h3 className="font-serif font-bold text-white/90 mt-4 text-2xl tracking-widest">D&M</h3>
-            </div>
-          </div>
-
-          {/* Item 5 */}
-          <div className="relative h-60 lg:h-64 rounded-3xl overflow-hidden shadow-2xl border border-white/10 transform -translate-y-12 hover:-translate-y-16 transition-transform duration-700">
-            <Image src="/img/login3.jpg" alt="Recuerdo" fill className="object-cover hover:scale-110 transition-transform duration-[2s]" />
-          </div>
+            return (
+              <div
+                key={colIdx}
+                className={`${visibilityClass} w-[190px] shrink-0 flex-col gap-4 sm:w-[230px] sm:gap-6 md:w-[250px] lg:w-[270px] ${animClass}`}
+                style={{ "--marquee-duration": duration } as React.CSSProperties}
+              >
+                {loopedItems.map((item, itemIdx) => (
+                  <div
+                    key={itemIdx}
+                    className="relative aspect-[3/4] w-full shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-sm"
+                  >
+                    {item.type === "image" && item.src ? (
+                      <Image
+                        src={item.src}
+                        alt={item.alt || "Recuerdo"}
+                        fill
+                        sizes="(max-width: 640px) 190px, (max-width: 1024px) 250px, 270px"
+                        className="object-cover transition-transform duration-700"
+                        priority={colIdx < 2 && itemIdx < 2}
+                      />
+                    ) : (
+                      <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-rose-950/40 via-purple-950/20 to-black/60">
+                        <Heart className="mb-3 size-7 fill-rose-400/80 text-rose-400" />
+                        <p className="font-display text-base font-semibold italic text-white/90">
+                          &ldquo;{item.text}&rdquo;
+                        </p>
+                        {item.subtext && (
+                          <span className="mt-2 text-xs uppercase tracking-wider text-rose-300/70 font-medium">
+                            {item.subtext}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  </div>
+                ))}
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Right Side - Glass Login Form (Desktop 40%) */}
-      <div className="lg:w-[40%] relative z-20 flex flex-col justify-center px-6 py-12 lg:px-20">
+      {/* ============================================================
+          CAPAS DE AMBIENTACIÓN Y GRADIENTES
+          ============================================================ */}
+      {/* Velo oscuro con viñeta para asegurar legibilidad perfecta */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#09080c] via-[#09080c]/65 to-[#09080c]/80 backdrop-blur-[2px]"
+        aria-hidden="true"
+      />
 
-        {/* Glass Card Container */}
-        <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-[2.5rem] p-8 lg:p-12 shadow-2xl shadow-black/50 overflow-hidden group">
+      {/* Luces y resplandores románticos */}
+      <div
+        className="pointer-events-none absolute -top-32 -left-32 size-[460px] rounded-full bg-rose-600/15 blur-[120px]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -bottom-32 -right-32 size-[480px] rounded-full bg-purple-900/20 blur-[130px]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[380px] rounded-full bg-rose-900/20 blur-[100px]"
+        aria-hidden="true"
+      />
 
-          {/* Inner Glow Effect */}
-          <div className="absolute -top-32 -right-32 w-64 h-64 bg-rose-500/30 rounded-full blur-3xl group-hover:bg-rose-500/40 transition-colors duration-1000" />
-          <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-blue-500/30 rounded-full blur-3xl group-hover:bg-blue-500/40 transition-colors duration-1000" />
+      {/* ============================================================
+          TARJETA DE LOGIN FLOTANTE (Glassmorphism de Lujo)
+          ============================================================ */}
+      <div className="relative z-20 flex w-full max-w-md items-center justify-center px-4 py-8 sm:px-6">
+        <div className="relative w-full overflow-hidden rounded-[2.25rem] border border-white/15 bg-[#121019]/80 p-7 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.85)] backdrop-blur-2xl sm:p-10">
+          {/* Línea de luz superior */}
+          <div
+            className="pointer-events-none absolute inset-x-8 -top-px h-px bg-gradient-to-r from-transparent via-rose-400/60 to-transparent"
+            aria-hidden="true"
+          />
 
-          <div className="relative z-10">
-            {/* Header */}
-            <div className="mb-10 text-center lg:text-left">
-              <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-rose-500/20 to-purple-500/20 border border-white/10 mb-6 shadow-glow">
-                <Sparkles className="w-6 h-6 text-rose-300 animate-pulse" />
-              </div>
-              <h1 className="text-4xl lg:text-5xl font-serif font-bold text-white mb-3 tracking-tight">
-                Bienvenido
-              </h1>
-              <p className="text-white/40 text-lg font-light">
-                Ingresa a nuestro universo personal.
-              </p>
+          {/* Encabezado */}
+          <header className="mb-7 text-center">
+            <div className="mx-auto mb-4 inline-flex items-center justify-center">
+              <span className="grid size-12 place-items-center rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-500/20 to-purple-950/40 shadow-lg shadow-rose-950/40">
+                <Heart className="size-6 fill-rose-400 text-rose-400 animate-heartbeat" aria-hidden="true" />
+              </span>
             </div>
+            <h1 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Nuestra Historia
+            </h1>
+            <p className="mt-2 text-sm font-light text-white/60 sm:text-base">
+              Ingresa a nuestro universo personal de recuerdos.
+            </p>
+          </header>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2 group/input">
-                <label className="text-xs font-bold text-white/50 uppercase tracking-wider ml-1 group-focus-within/input:text-rose-400 transition-colors">Email</label>
+          {/* Formulario */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Campo Email */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="login-email"
+                className="ml-1 block text-xs font-semibold uppercase tracking-wider text-white/60"
+              >
+                Correo electrónico
+              </label>
+              <div className="relative">
+                <Mail
+                  className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-white/35"
+                  aria-hidden="true"
+                />
                 <input
+                  id="login-email"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-5 py-4 rounded-xl bg-black/20 border border-white/10 focus:bg-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 transition-all duration-300 outline-none text-white placeholder-white/20 font-medium"
+                  className="w-full rounded-xl border border-white/10 bg-black/35 py-3.5 pl-11 pr-4 text-base text-white placeholder-white/25 outline-none transition-all duration-200 focus:border-rose-400/70 focus:bg-white/[0.07] focus:ring-4 focus:ring-rose-500/15"
                   placeholder="tu@email.com"
                   required
                 />
               </div>
+            </div>
 
-              <div className="space-y-2 group/input">
-                <div className="flex justify-between ml-1">
-                  <label className="text-xs font-bold text-white/50 uppercase tracking-wider group-focus-within/input:text-rose-400 transition-colors">Contraseña</label>
-                </div>
+            {/* Campo Contraseña */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between px-1">
+                <label
+                  htmlFor="login-password"
+                  className="block text-xs font-semibold uppercase tracking-wider text-white/60"
+                >
+                  Contraseña
+                </label>
+              </div>
+              <div className="relative">
+                <Lock
+                  className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-white/35"
+                  aria-hidden="true"
+                />
                 <input
-                  type="password"
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-5 py-4 rounded-xl bg-black/20 border border-white/10 focus:bg-white/10 focus:border-rose-500/50 focus:ring-4 focus:ring-rose-500/10 transition-all duration-300 outline-none text-white placeholder-white/20 font-medium tracking-widest"
+                  className="w-full rounded-xl border border-white/10 bg-black/35 py-3.5 pl-11 pr-12 text-base text-white placeholder-white/25 outline-none transition-all duration-200 focus:border-rose-400/70 focus:bg-white/[0.07] focus:ring-4 focus:ring-rose-500/15"
                   placeholder="••••••••"
                   required
                 />
-              </div>
-
-              {loginError && (
-                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 text-sm text-center font-medium backdrop-blur-md animate-shake">
-                  {loginError}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 text-white font-bold text-lg shadow-lg shadow-rose-900/20 hover:shadow-rose-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed border border-white/10 relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 blur-md" />
-
-                <div className="relative flex items-center gap-2">
-                  {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-pressed={showPassword}
+                  className="absolute right-1.5 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-lg text-white/40 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-4" aria-hidden="true" />
                   ) : (
-                    <>
-                      Entrar
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </>
+                    <Eye className="size-4" aria-hidden="true" />
                   )}
-                </div>
-              </button>
-
-              <div className="text-center pt-2">
-                <a href="#" className="text-xs text-white/30 hover:text-white/60 transition-colors border-b border-transparent hover:border-white/30 pb-0.5">
-                  ¿Olvidaste la clave?
-                </a>
+                </button>
               </div>
-            </form>
-          </div>
+            </div>
+
+            {/* Error si ocurre */}
+            {loginError && (
+              <div
+                role="alert"
+                className="rounded-xl border border-rose-500/30 bg-rose-500/15 p-3.5 text-center text-sm font-medium text-rose-200 backdrop-blur-sm"
+              >
+                {loginError}
+              </div>
+            )}
+
+            {/* Botón de Entrada */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group relative flex min-h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-rose-600 via-rose-500 to-rose-700 py-3.5 text-base font-semibold text-white shadow-lg shadow-rose-950/50 transition-all duration-300 hover:scale-[1.01] hover:shadow-rose-600/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <div
+                className="pointer-events-none absolute inset-0 bg-white/15 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                aria-hidden="true"
+              />
+              {isLoading ? (
+                <span
+                  className="size-5 animate-spin rounded-full border-2 border-white/30 border-t-white"
+                  aria-label="Ingresando"
+                />
+              ) : (
+                <>
+                  <span>Entrar</span>
+                  <ArrowRight
+                    className="size-4 transition-transform duration-200 group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Cita o detalle inferior */}
+          <footer className="mt-8 text-center">
+            <p className="font-display text-xs italic text-white/40">
+              &ldquo;Donde cada recuerdo permanece para siempre.&rdquo;
+            </p>
+          </footer>
         </div>
       </div>
-    </div>
+    </main>
   );
-};
-
-export default Login;
+}

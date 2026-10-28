@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import { X } from 'lucide-react';
 
 type MasonryItem = {
   id: string;
@@ -26,145 +26,154 @@ interface MasonryProps {
   colorShiftOnHover?: boolean;
 }
 
-function getStartTransform(direction: AnimateFrom): string {
-  switch (direction) {
-    case 'bottom':
-      return 'translateY(12px)';
-    case 'top':
-      return 'translateY(-12px)';
-    case 'left':
-      return 'translateX(-12px)';
-    case 'right':
-      return 'translateX(12px)';
-    default:
-      return 'none';
-  }
-}
-
-const ImageComponent = ({ item, imgStyles, scaleOnHover, hoverScale, colorShiftOnHover }: { item: MasonryItem, imgStyles: React.CSSProperties, scaleOnHover?: boolean, hoverScale?: number, colorShiftOnHover?: boolean }) => {
-  const normalize = (url: string) => url?.startsWith('http://') ? url.replace('http://', 'https://') : url;
-  const [src, setSrc] = React.useState<string>(() => normalize(item.img));
-  return (
-    <div className="relative">
-      <img
-        src={src}
-        alt={item.alt || item.title || `item-${item.id}`}
-        className={`w-full h-auto object-cover block ${
-          scaleOnHover ? 'group-hover:scale-[var(--hoverScale,0.95)]' : ''
-        } ${colorShiftOnHover ? 'group-hover:saturate-150' : ''}`}
-        style={{
-          ...imgStyles,
-          transform: scaleOnHover ? 'translateZ(0)' : undefined,
-        }}
-        onMouseEnter={(e) => {
-          if (scaleOnHover) {
-            (e.currentTarget as HTMLImageElement).style.transform = `scale(${hoverScale})`;
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (scaleOnHover) {
-            (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)';
-          }
-        }}
-        onError={() => {
-          // Reintento con https si por alguna razón llegó http o la primera carga falló
-          if (src?.startsWith('http://')) {
-            setSrc(src.replace('http://', 'https://'));
-          }
-        }}
-        loading="lazy"
-      />
-      {item.title && (
-        <div className="absolute inset-0 flex items-end p-4 sm:p-6 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-          <h3 className="text-white text-lg lg:text-xl font-bold tracking-tight transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
-            {item.title}
-          </h3>
-        </div>
-      )}
-    </div>
-  );
-};
-
 export default function Masonry({
   items,
-  ease = 'ease',
   duration = 0.6,
   stagger = 0.05,
   animateFrom = 'bottom',
   scaleOnHover = true,
-  hoverScale = 0.95,
-  blurToFocus = true,
+  hoverScale = 1.04,
   colorShiftOnHover = false,
 }: MasonryProps) {
+  const [openIndex, setOpenIndex] = React.useState<number | null>(null);
+  const rootRef = React.useRef<HTMLDivElement>(null);
+
+  // One observer for the whole grid instead of one per card.
+  React.useEffect(() => {
+    const node = rootRef.current;
+    if (!node || animateFrom === 'none') return;
+
+    const cards = Array.from(node.querySelectorAll<HTMLElement>('[data-masonry-item]'));
+    if (!('IntersectionObserver' in window)) {
+      cards.forEach((card) => card.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -5% 0px' }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+    return () => observer.disconnect();
+  }, [animateFrom, items]);
+
+  // Lightbox controls: Escape closes, page scroll is locked while open.
+  React.useEffect(() => {
+    if (openIndex === null) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpenIndex(null);
+      if (event.key === 'ArrowRight') setOpenIndex((i) => (i === null ? i : (i + 1) % items.length));
+      if (event.key === 'ArrowLeft') setOpenIndex((i) => (i === null ? i : (i - 1 + items.length) % items.length));
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [openIndex, items.length]);
+
+  const openItem = openIndex === null ? null : items[openIndex];
+
   return (
-    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 [column-fill:_balance]">
-      {items.map((item, index) => {
-        const startTransform = getStartTransform(animateFrom);
-        const transition = `${duration}s ${ease}`;
-        const delay = `${(stagger || 0) * index}s`;
+    <>
+      <div
+        ref={rootRef}
+        className="columns-1 gap-3 sm:columns-2 sm:gap-4 lg:columns-3 xl:columns-4 [column-fill:_balance]"
+      >
+        {items.map((item, index) => {
+          const normalizedSrc = item.img?.startsWith('http://')
+            ? item.img.replace('http://', 'https://')
+            : item.img;
 
-        const cardStyles: React.CSSProperties = {
-          opacity: animateFrom === 'none' ? 1 : 0,
-          transform: animateFrom === 'none' ? 'none' : startTransform,
-          transitionProperty: 'opacity, transform, filter, background-color',
-          transitionDuration: transition,
-          transitionDelay: delay,
-        };
+          return (
+            <div
+              key={item.id}
+              data-masonry-item
+              className={`group relative mb-3 break-inside-avoid overflow-hidden rounded-2xl bg-surface shadow-soft transition-[opacity,transform] sm:mb-4 ${
+                animateFrom === 'none' ? '' : 'masonry-hidden'
+              }`}
+              style={{ transitionDuration: `${duration}s`, transitionDelay: `${stagger * Math.min(index, 8)}s` }}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenIndex(index)}
+                aria-label={item.title ? `Ampliar ${item.title}` : 'Ampliar imagen'}
+                className="block w-full cursor-zoom-in"
+              >
+                <img
+                  src={normalizedSrc}
+                  alt={item.alt || item.title || `Recuerdo ${index + 1}`}
+                  className={`block h-auto w-full object-cover transition-transform duration-500 ${
+                    scaleOnHover ? 'group-hover:scale-[var(--hover-scale,1.04)]' : ''
+                  } ${colorShiftOnHover ? 'group-hover:saturate-125' : ''}`}
+                  style={{
+                    '--hover-scale': hoverScale,
+                    ...(item.height ? { height: `${item.height}px` } : {}),
+                  } as React.CSSProperties}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </button>
 
-        const imgStyles: React.CSSProperties = {
-          height: item.height ? `${item.height}px` : undefined,
-          filter: blurToFocus ? 'blur(3px)' : undefined,
-          transition: `transform ${transition}, filter ${transition}`,
-        };
+              {item.title && (
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent p-3 pt-10 sm:p-4">
+                  <h3 className="line-clamp-2 font-display text-sm font-semibold text-white sm:text-base">
+                    {item.title}
+                  </h3>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
-        return (
-          <div
-            key={item.id}
-            className="mb-4 break-inside-avoid overflow-hidden rounded-xl shadow-md group"
-            style={cardStyles}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLDivElement;
-              if (animateFrom !== 'none') {
-                el.style.opacity = '1';
-                el.style.transform = 'none';
-              }
-            }}
-            onMouseOver={(e) => {
-              const img = e.currentTarget.querySelector('img');
-              if (img && blurToFocus) img.style.filter = 'blur(0px)';
-            }}
-            onMouseOut={(e) => {
-              const img = e.currentTarget.querySelector('img');
-              if (img && blurToFocus) img.style.filter = 'blur(3px)';
-            }}
-            ref={(node) => {
-              if (!node || animateFrom === 'none') return;
-              const observer = new IntersectionObserver(
-                (entries) => {
-                  entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                      const el = entry.target as HTMLDivElement;
-                      el.style.opacity = '1';
-                      el.style.transform = 'none';
-                      observer.unobserve(el);
-                    }
-                  });
-                },
-                { threshold: 0.1 }
-              );
-              observer.observe(node);
-            }}
+      {openItem && (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/90 p-3 backdrop-blur-sm sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label={openItem.title || 'Imagen ampliada'}
+          onClick={() => setOpenIndex(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setOpenIndex(null)}
+            aria-label="Cerrar imagen"
+            className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 grid size-11 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:right-6 sm:top-6"
           >
-            {item.url ? (
-              <Link href={item.url} target="_blank">
-                <ImageComponent item={item} imgStyles={imgStyles} scaleOnHover={scaleOnHover} hoverScale={hoverScale} colorShiftOnHover={colorShiftOnHover} />
-              </Link>
-            ) : (
-              <ImageComponent item={item} imgStyles={imgStyles} scaleOnHover={scaleOnHover} hoverScale={hoverScale} colorShiftOnHover={colorShiftOnHover} />
+            <X className="size-5" aria-hidden="true" />
+          </button>
+
+          <figure
+            className="flex max-h-full w-full max-w-4xl flex-col items-center gap-3"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <img
+              src={
+                openItem.img?.startsWith('http://')
+                  ? openItem.img.replace('http://', 'https://')
+                  : openItem.img
+              }
+              alt={openItem.alt || openItem.title || 'Imagen ampliada'}
+              className="max-h-[78svh] w-auto max-w-full rounded-xl object-contain"
+            />
+            {openItem.title && (
+              <figcaption className="text-center font-display text-sm text-white/80 sm:text-base">
+                {openItem.title}
+              </figcaption>
             )}
-          </div>
-        );
-      })}
-    </div>
+          </figure>
+        </div>
+      )}
+    </>
   );
 }

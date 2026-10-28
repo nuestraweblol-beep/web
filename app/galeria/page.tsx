@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Masonry from './Masonry';
-import { Loader, AlertTriangle } from 'lucide-react';
+import { Loader, AlertTriangle, ImageOff } from 'lucide-react';
 import { galeriaService, GaleriaItem } from '@/lib/services/galeriaService';
 
 export default function GaleriaPage() {
@@ -38,10 +38,10 @@ export default function GaleriaPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center">
-          <Loader className="h-12 w-12 animate-spin text-rose-500" />
-          <p className="mt-4 text-lg text-gray-600">Cargando galería...</p>
+      <div className="flex min-h-[100svh] items-center justify-center bg-paper pt-[var(--nav-offset)]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader className="size-10 animate-spin text-accent" aria-hidden="true" />
+          <p className="text-sm text-ink-muted">Cargando galería...</p>
         </div>
       </div>
     );
@@ -49,15 +49,15 @@ export default function GaleriaPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-red-50">
-        <div className="flex flex-col items-center text-center p-8">
-          <AlertTriangle className="h-12 w-12 text-red-500" />
-          <h2 className="mt-4 text-2xl font-bold text-red-700">Ocurrió un error</h2>
-          <p className="mt-2 text-gray-600">No se pudo cargar la galería. Por favor, inténtalo de nuevo más tarde.</p>
-          <p className="mt-2 text-sm text-gray-500">Detalle: {error}</p>
+      <div className="flex min-h-[100svh] items-center justify-center bg-paper px-4 pt-[var(--nav-offset)]">
+        <div className="flex max-w-sm flex-col items-center rounded-3xl border border-line bg-surface p-6 text-center shadow-soft">
+          <AlertTriangle className="size-10 text-amber-500" aria-hidden="true" />
+          <h2 className="mt-4 font-display text-xl font-bold text-ink">No se pudo cargar la galería</h2>
+          <p className="mt-2 text-sm text-ink-muted">{error}</p>
           <button
+            type="button"
             onClick={fetchData}
-            className="mt-4 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600"
+            className="mt-5 min-h-11 rounded-full bg-accent px-6 font-semibold text-white transition-colors hover:bg-accent/90"
           >
             Reintentar
           </button>
@@ -67,27 +67,37 @@ export default function GaleriaPage() {
   }
 
   return (
-    <main className="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="max-w-7xl mx-auto text-center mb-16 animate-fade-in-up">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 mb-4 font-serif">
-          Nuestra Galería
-        </h1>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto italic font-light">
-          "Quiero atesorar cada momento especial por siempre."
-        </p>
-      </div>
+    <main className="min-h-[100svh] bg-paper pb-24 pt-[var(--nav-offset)] text-ink">
+      <div className="page-container">
+        <header className="mb-8 pt-8 text-center sm:mb-12 sm:pt-12">
+          <h1 className="text-balance font-display text-3xl font-bold leading-tight text-ink sm:text-4xl md:text-5xl">
+            Nuestra Galería
+          </h1>
+          <p className="mx-auto mt-3 max-w-xl font-display text-base italic text-ink-muted sm:text-lg">
+            &ldquo;Quiero atesorar cada momento especial por siempre.&rdquo;
+          </p>
+        </header>
 
-      <Masonry
-        items={items}
-        ease="power3.out"
-        duration={0.6}
-        stagger={0.05}
-        animateFrom="bottom"
-        scaleOnHover={true}
-        hoverScale={1.05}
-        blurToFocus={false}
-        colorShiftOnHover={false}
-      />
+        {items.length === 0 ? (
+          <div className="mx-auto max-w-md rounded-3xl border border-dashed border-line bg-surface/60 px-6 py-16 text-center">
+            <ImageOff className="mx-auto mb-4 size-9 text-ink-muted/50" aria-hidden="true" />
+            <p className="font-display text-xl text-ink">La galería está vacía</p>
+            <p className="mt-2 text-sm text-ink-muted">
+              Los recuerdos aparecerán aquí cuando se suban las primeras fotos.
+            </p>
+          </div>
+        ) : (
+          <Masonry
+            items={items}
+            duration={0.6}
+            stagger={0.05}
+            animateFrom="bottom"
+            scaleOnHover={true}
+            hoverScale={1.04}
+            colorShiftOnHover={false}
+          />
+        )}
+      </div>
     </main>
   );
 }

@@ -2,19 +2,20 @@
 
 .anniversary-page {
     background: #f5f0eb;
-    min-height: 100vh;
+    min-height: 100svh;
+    padding-top: var(--nav-offset);
     font-family: 'Georgia', 'Times New Roman', serif;
 }
 
 /* Hero Section */
 .hero-anniversary {
-    min-height: 100vh;
+    min-height: calc(100svh - var(--nav-offset));
     background: linear-gradient(135deg, #f5e6e8 0%, #ede4e0 50%, #f5ece8 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 8rem 2rem 4rem;
+    padding: 3rem 2rem 4rem;
     position: relative;
     overflow: hidden;
 }
@@ -227,6 +228,19 @@
     font-style: italic;
 }
 
+.promise-list {
+    margin: 1rem 0 0;
+    padding-left: 1.25rem;
+    list-style: decimal;
+    font-style: normal;
+}
+
+.promise-list li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+    padding-left: 0.25rem;
+}
+
 .letter-signature {
     font-size: 1.125rem;
     text-align: right;
@@ -304,8 +318,17 @@
 }
 
 .memory-icon {
-    font-size: 3rem;
-    opacity: 0.25;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+}
+
+.memory-icon img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* CTA Section */
@@ -396,6 +419,11 @@
     font-size: 1.25rem;
 }
 
+.cta-button svg {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
 .button-heart {
     font-size: 1.25rem;
     animation: beat-heart 1.5s ease-in-out infinite;
@@ -462,25 +490,40 @@
 
     .hero-anniversary,
     .cta-section {
-        padding: 5rem 1rem 2rem;
+        padding: 2.5rem 1rem 2.5rem;
     }
 
     .letter-section,
     .memories-section {
-        padding: 4rem 1rem;
+        padding: 3rem 1rem;
+    }
+
+    .letter-header,
+    .memories-header {
+        margin-bottom: 2rem;
     }
 
     .letter-card {
-        padding: 2rem 1.5rem;
+        padding: 1.75rem 1.25rem;
+    }
+
+    .highlight-paragraph {
+        padding: 1rem;
     }
 
     .letter-paragraph {
         font-size: 1rem;
+        line-height: 1.8;
         text-align: left;
     }
 
     .memories-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .cta-section {
+        min-height: 0;
     }
 
     .cta-button {
@@ -493,6 +536,6 @@
     }
 
     .scroll-indicator {
-        bottom: 2rem;
+        bottom: 1.5rem;
     }
 }

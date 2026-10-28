@@ -1,13 +1,12 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import Navbar from "../components/header";
+import { ArrowRight } from 'lucide-react';
 import "./aniversario.css";
 
 const AniversarioPage = () => {
     return (
         <>
-            <Navbar />
             <div className="anniversary-page">
 
                 {/* Hero Section */}
@@ -23,7 +22,7 @@ const AniversarioPage = () => {
                             <span className="title-highlight">cada día es especial</span>
                         </h1>
                         <p className="hero-text-anniversary">
-                            Porque lo que empezó como un día de entrenamiento más se convirtió en la<br />
+                            Porque lo que empezó como un día de entrenamiento más se convirtió en la
                             historia más bonita de mi vida.
                         </p>
                     </div>
@@ -64,49 +63,31 @@ const AniversarioPage = () => {
 
                             </p>
 
-                            <p className="letter-paragraph highlight-paragraph">
-                                El día de hoy, con tu regalo, quiero que sepas que te prometo:
-                                <br />
-                                1. Prometo amarte incluso en los momentos en que nos enojamos..
-                                <br />
-                                2. Prometo mimarte siempre que sea posible..
-                                <br />
-                                3. Prometo ser más abierto con mis sentimientos.
-                                <br />
-                                4. Prometo intentar mejorar cada día, aunque sea un poco.
-                                <br />
-                                5. Prometo respetar tus emociones, aunque no siempre las entienda.
-                                <br />
-                                6. Prometo apoyarte en tus días buenos y en los no tan buenos.
-                                <br />
-                                7. Prometo esforzarme por comunicarme mejor contigo.
-                                <br />
-                                8. Prometo celebrar tus logros, grandes o pequeños.
-                                <br />
-                                9. Prometo intentar no irme a dormir enojado sin importar que.
-                                <br />
-                                10. Prometo darte tu espacio cuando lo necesites.
-                                <br />
-                                11. Prometo ser honesto contigo.
-                                <br />
-                                12. Prometo hacerte reír cuando pueda.
-                                <br />
-                                13. Prometo no dar tu amor por sentado.
-                                <br />
-                                14. Prometo confiar en ti.
-                                <br />
-                                15. Prometo molestarte aunque me pelees.
-                                <br />
-                                16. Prometo aprender a amar mejor.
-                                <br />
-                                17. Prometo compartir mis miedos contigo.
-                                <br />
-                                18. Prometo no dejar que el orgullo me gane.
-                                <br />
-                                19. Prometo esforzarme por entenderte mejor.
-                                <br />
-                                20. Prometo seguir caminando a tu lado mientras tenga la posibilidad.
-                            </p>
+                            <div className="letter-paragraph highlight-paragraph">
+                                <p>El día de hoy, con tu regalo, quiero que sepas que te prometo:</p>
+                                <ol className="promise-list">
+                                    <li>Prometo amarte incluso en los momentos en que nos enojamos.</li>
+                                    <li>Prometo mimarte siempre que sea posible.</li>
+                                    <li>Prometo ser más abierto con mis sentimientos.</li>
+                                    <li>Prometo intentar mejorar cada día, aunque sea un poco.</li>
+                                    <li>Prometo respetar tus emociones, aunque no siempre las entienda.</li>
+                                    <li>Prometo apoyarte en tus días buenos y en los no tan buenos.</li>
+                                    <li>Prometo esforzarme por comunicarme mejor contigo.</li>
+                                    <li>Prometo celebrar tus logros, grandes o pequeños.</li>
+                                    <li>Prometo intentar no irme a dormir enojado sin importar qué.</li>
+                                    <li>Prometo darte tu espacio cuando lo necesites.</li>
+                                    <li>Prometo ser honesto contigo.</li>
+                                    <li>Prometo hacerte reír cuando pueda.</li>
+                                    <li>Prometo no dar tu amor por sentado.</li>
+                                    <li>Prometo confiar en ti.</li>
+                                    <li>Prometo molestarte aunque me pelees.</li>
+                                    <li>Prometo aprender a amar mejor.</li>
+                                    <li>Prometo compartir mis miedos contigo.</li>
+                                    <li>Prometo no dejar que el orgullo me gane.</li>
+                                    <li>Prometo esforzarme por entenderte mejor.</li>
+                                    <li>Prometo seguir caminando a tu lado mientras tenga la posibilidad.</li>
+                                </ol>
+                            </div>
 
                             <p className="letter-signature">
                                 Te amo de aquí a la luna a pasitos de tortuga.❤️🐢<br />
@@ -127,64 +108,64 @@ const AniversarioPage = () => {
                     <div className="memories-grid">
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/enero.jpg" alt="Enero" /></span>
+                                <span className="memory-icon"><img src="/img/enero.jpg" alt="Enero" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
                                 {/* Falta imagen de febrero en la carpeta public/img */}
-                                <span className="memory-icon"><img src="/img/febrero.jpg" alt="Febrero" /></span>
+                                <span className="memory-icon"><img src="/img/febrero.jpg" alt="Febrero" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/marzo.png" alt="Marzo" /></span>
+                                <span className="memory-icon"><img src="/img/marzo.png" alt="Marzo" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
                                 {/* Falta imagen de abril en la carpeta public/img */}
-                                <span className="memory-icon"><img src="/img/abril.jpg" alt="Abril" /></span>
+                                <span className="memory-icon"><img src="/img/abril.jpg" alt="Abril" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/mayo.jpg" alt="Mayo" /></span>
+                                <span className="memory-icon"><img src="/img/mayo.jpg" alt="Mayo" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/junio.jpg" alt="Junio" /></span>
+                                <span className="memory-icon"><img src="/img/junio.jpg" alt="Junio" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/julio.jpg" alt="Julio" /></span>
+                                <span className="memory-icon"><img src="/img/julio.jpg" alt="Julio" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/agosto.jpg" alt="Agosto" /></span>
+                                <span className="memory-icon"><img src="/img/agosto.jpg" alt="Agosto" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/septiembre.jpg" alt="Septiembre" /></span>
+                                <span className="memory-icon"><img src="/img/septiembre.jpg" alt="Septiembre" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/octubre.jpg" alt="Octubre" /></span>
+                                <span className="memory-icon"><img src="/img/octubre.jpg" alt="Octubre" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/noviembre.png" alt="Noviembre" /></span>
+                                <span className="memory-icon"><img src="/img/noviembre.png" alt="Noviembre" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                         <div className="memory-card">
                             <div className="memory-placeholder">
-                                <span className="memory-icon"><img src="/img/diciembre.jpg" alt="Diciembre" /></span>
+                                <span className="memory-icon"><img src="/img/diciembre.jpg" alt="Diciembre" loading="lazy" decoding="async" /></span>
                             </div>
                         </div>
                     </div>
@@ -201,9 +182,8 @@ const AniversarioPage = () => {
 
 
                         <Link href="/sueno" className="cta-button">
-                            <span className="button-icon">✨</span>
                             Algo extra para ti
-                            <span className="button-heart">♥</span>
+                            <ArrowRight className="button-icon" aria-hidden="true" />
                         </Link>
                     </div>
 

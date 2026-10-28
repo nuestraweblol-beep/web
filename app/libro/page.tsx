@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, TransitionEvent } from "react";
+import { useState, useEffect, useRef, TransitionEvent } from "react";
 import { BookOpen, Camera, ChevronLeft, ChevronRight } from "lucide-react";
 import { chapterArt } from "./ChapterArt";
 import "./libro.css";
@@ -448,6 +448,26 @@ export default function LibroPage() {
         return () => window.removeEventListener("keydown", onKey);
     });
 
+    // Swipe left/right on the book to turn pages on touch devices.
+    const touchStart = useRef<{ x: number; y: number } | null>(null);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        const touch = e.changedTouches[0];
+        touchStart.current = { x: touch.clientX, y: touch.clientY };
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        if (!touchStart.current) return;
+        const touch = e.changedTouches[0];
+        const dx = touch.clientX - touchStart.current.x;
+        const dy = touch.clientY - touchStart.current.y;
+        touchStart.current = null;
+
+        // Ignore vertical gestures (reading/scroll inside the page).
+        if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+        goTo(dx < 0 ? "next" : "prev");
+    };
+
     const handleFlipEnd = (e: TransitionEvent) => {
         if (e.propertyName !== "transform" || !flip) return;
         setIndex(flip.to);
@@ -470,7 +490,11 @@ export default function LibroPage() {
             </section>
 
             <div className="libro-book">
-                <div className="libro-stage">
+                <div
+                    className="libro-stage"
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                >
                     <button
                         className="libro-edge libro-edge-left"
                         onClick={() => goTo("prev")}

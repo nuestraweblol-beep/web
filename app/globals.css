@@ -1,39 +1,149 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   Design tokens — "romántico refinado"
+   Una paleta, una tipografía display, una sans, un acento.
+   ============================================================ */
+@theme {
+  --color-paper: #faf7f3;
+  --color-surface: #ffffff;
+  --color-ink: #1c1917;
+  --color-ink-soft: #57534e;
+  --color-ink-muted: #8a8078;
+  --color-line: #e7e0d8;
+  --color-accent: #9f3a52;
+  --color-accent-soft: #f6e9ec;
+  --color-night: #121019;
+  --color-gold: #c9a227;
+
+  /* Christmas */
+  --color-christmas-red: #9b2323;
+  --color-christmas-green: #2f5d3a;
+  --color-christmas-gold: #d3a13a;
+  --color-christmas-cream: #f3ece1;
+
+  /* Typography */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino,
+    Georgia, serif;
+
+  /* Shape & depth */
+  --radius-card: 1.25rem;
+  --shadow-soft: 0 1px 2px rgb(28 25 23 / 0.04),
+    0 12px 32px -12px rgb(28 25 23 / 0.18);
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --nav-h: 3.5rem;
+    --nav-top: 0.75rem;
+    --nav-offset: calc(
+      var(--nav-h) + var(--nav-top) + 0.75rem + env(safe-area-inset-top)
+    );
+  }
+
+  html {
+    background-color: var(--color-paper);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100svh;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================
+   Layout helpers
+   ============================================================ */
+.nav-offset {
+  padding-top: var(--nav-offset);
 }
 
-/* Custom Animations */
-@keyframes twinkle {
+.page-container {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
 
+@media (min-width: 640px) {
+  .page-container {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-container {
+    padding-inline: 2rem;
+  }
+}
+
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Chips/titles never break the layout */
+.text-balance {
+  text-wrap: balance;
+}
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* Gallery items animate in once, observed by a single IntersectionObserver */
+.masonry-hidden {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.masonry-hidden.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ============================================================
+   Animations (presupuesto corto: entrada + hover)
+   ============================================================ */
+@keyframes twinkle {
   0%,
   100% {
     opacity: 1;
     transform: scale(1);
   }
-
   50% {
     opacity: 0.5;
     transform: scale(0.8);
@@ -45,13 +155,11 @@ body {
 }
 
 @keyframes sparkle {
-
   0%,
   100% {
     opacity: 0;
     transform: scale(0) rotate(0deg);
   }
-
   50% {
     opacity: 1;
     transform: scale(1) rotate(180deg);
@@ -65,9 +173,8 @@ body {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(12px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -75,14 +182,81 @@ body {
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 1s ease-out forwards;
+  animation: fadeInUp 0.7s var(--ease-out) both;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-40px) rotate(8deg);
+    opacity: 0.45;
+  }
+}
+
+.animate-float {
+  animation: float 12s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 2.6s ease-in-out infinite;
+}
+
+@keyframes marquee-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes marquee-down {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-marquee-up {
+  animation: marquee-up var(--marquee-duration, 45s) linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-down {
+  animation: marquee-down var(--marquee-duration, 50s) linear infinite;
+  will-change: transform;
 }
 
 .backface-hidden {
   backface-visibility: hidden;
 }
 
-/* Handwriting font fallback if desired */
-.font-handwriting {
-  font-family: 'Brush Script MT', 'Comic Sans MS', cursive;
+/* ============================================================
+   Accessibility: no motion unless the user asks for it
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

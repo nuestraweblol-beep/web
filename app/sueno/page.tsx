@@ -1,12 +1,10 @@
 "use client";
 import React from 'react';
-import Navbar from "../components/header";
 import "./sueno.css";
 
 const SuenoPage = () => {
     return (
         <>
-            <Navbar />
             <div className="editorial-page">
                 {/* Hero Section */}
                 <section className="hero-section">
@@ -37,7 +35,7 @@ const SuenoPage = () => {
                             <div className="image-column">
                                 <div className="editorial-image">
                                     <div className="image-placeholder">
-                                        <img src="/img/lugar.jpeg" alt="" />
+                                        <img src="/img/lugar.jpeg" alt="Ilustración del sueño" loading="lazy" decoding="async" />
                                     </div>
                                 </div>
                             </div>
@@ -50,7 +48,7 @@ const SuenoPage = () => {
                             <div className="image-column">
                                 <div className="editorial-image">
                                     <div className="image-placeholder">
-                                        <img src="/img/vestido.jpeg" alt="" />
+                                        <img src="/img/vestido.jpeg" alt="Ilustración del sueño" loading="lazy" decoding="async" />
                                     </div>
                                 </div>
                             </div>
@@ -90,7 +88,7 @@ const SuenoPage = () => {
                             <div className="image-column">
                                 <div className="editorial-image">
                                     <div className="image-placeholder">
-                                        <img src="/img/noche.jpeg" alt="" />
+                                        <img src="/img/noche.jpeg" alt="Ilustración del sueño" loading="lazy" decoding="async" />
                                     </div>
                                 </div>
                             </div>
@@ -103,7 +101,7 @@ const SuenoPage = () => {
                             <div className="image-column">
                                 <div className="editorial-image">
                                     <div className="image-placeholder">
-                                        <img src="/img/anillo.jpeg" alt="" />
+                                        <img src="/img/anillo.jpeg" alt="Ilustración del sueño" loading="lazy" decoding="async" />
                                     </div>
                                 </div>
                             </div>
@@ -129,7 +127,8 @@ const SuenoPage = () => {
                         <div className="closing-content">
                             <p className="closing-quote">
                                 He pensado mucho en nosotros y en ese futuro del que a veces hablamos. Si en algún momento me notas pensativo o serio cuando lo mencionas, no es porque no lo quiera, sino porque soy consciente de todo el camino que aún tenemos por recorrer para llegar ahí.
-                                <br /><br />
+                            </p>
+                            <p className="closing-quote">
                                 Construir algo tan bonito y tan sólido toma tiempo. Requiere que sigamos creciendo como personas, en lo profesional y, sobre todo, como pareja. Las cosas grandes no se hacen de la noche a la mañana, pero saber que estamos caminando juntos en esa dirección es lo que de verdad importa para mí.
                             </p>
                             <p className="signature">Te amo mucho, mi amor. </p>

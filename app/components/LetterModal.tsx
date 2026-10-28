@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { Mail, X } from "lucide-react";
 
 interface LetterModalProps {
     isOpen: boolean;
@@ -20,63 +21,91 @@ const LetterModal = ({ isOpen, onClose, letter }: LetterModalProps) => {
         setMounted(true);
     }, []);
 
+    // Close with Escape and keep the page behind the modal still.
+    useEffect(() => {
+        if (!mounted || !isOpen) return;
+
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") onClose();
+        };
+        window.addEventListener("keydown", onKeyDown);
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            window.removeEventListener("keydown", onKeyDown);
+        };
+    }, [mounted, isOpen, onClose]);
+
     if (!mounted || !isOpen || !letter) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div
+            className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="carta-navidad-titulo"
+        >
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-                onClick={onClose}
-            />
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 
-            {/* Modal Card */}
-            <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-[#fffdf5] rounded-xl shadow-2xl overflow-hidden animate-reveal border-4 border-double border-amber-500/50">
-                {/* Decorative Elements */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-700 via-green-800 to-red-700 z-20" />
-                <div className="absolute -top-10 -right-10 w-24 h-24 bg-red-600 rotate-45 opacity-10 blur-xl pointer-events-none" />
-                <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-green-700 rotate-45 opacity-10 blur-xl pointer-events-none" />
+            <div className="relative flex min-h-full items-start justify-center p-2.5 sm:items-center sm:p-4">
+                {/* Modal Card */}
+                <div className="relative my-2 flex max-h-[calc(100svh-1.25rem)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-2 border-double border-amber-500/50 bg-[#fffdf5] shadow-2xl animate-reveal sm:my-8 sm:max-h-[90svh] sm:rounded-xl sm:border-4">
+                    {/* Decorative Elements */}
+                    <div className="absolute inset-x-0 top-0 z-20 h-1.5 bg-gradient-to-r from-red-700 via-green-800 to-red-700" aria-hidden="true" />
+                    <div className="pointer-events-none absolute -right-10 -top-10 size-24 rotate-45 bg-red-600 opacity-10 blur-xl" aria-hidden="true" />
+                    <div className="pointer-events-none absolute -bottom-10 -left-10 size-24 rotate-45 bg-green-700 opacity-10 blur-xl" aria-hidden="true" />
 
-                {/* Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 z-50 p-2 text-red-800/70 hover:text-red-900 hover:bg-red-100/50 rounded-full transition-all duration-300"
-                    aria-label="Cerrar"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+                    {/* Close Button */}
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="absolute right-2 top-2 z-50 grid size-11 place-items-center rounded-full text-red-800/70 transition-colors hover:bg-red-100/60 hover:text-red-900 sm:right-4 sm:top-4"
+                        aria-label="Cerrar carta"
+                    >
+                        <X className="size-6" aria-hidden="true" />
+                    </button>
 
-                {/* Content */}
-                <div className="p-8 md:p-10 flex flex-col items-center text-center relative z-10 overflow-y-auto flex-1 w-full">
-                    <div className="text-5xl mb-6 animate-bounce" style={{ animationDuration: '3s' }}>💌</div>
+                    {/* Content */}
+                    <div className="relative z-10 flex w-full flex-1 flex-col items-center overflow-y-auto overscroll-contain p-5 pt-14 text-center sm:p-8 sm:pt-12 md:p-10">
+                        <Mail className="mb-4 size-8 text-red-700/80 sm:mb-5 sm:size-10" aria-hidden="true" />
 
-                    <h2 className="font-script text-4xl md:text-5xl text-red-800 mb-6 drop-shadow-sm leading-relaxed">
-                        {letter.title}
-                    </h2>
+                        <h2
+                            id="carta-navidad-titulo"
+                            className="mb-4 text-balance font-script text-2xl leading-tight text-red-800 drop-shadow-sm sm:mb-6 sm:text-4xl md:text-5xl"
+                        >
+                            {letter.title}
+                        </h2>
 
-                    <div className="relative w-full py-8 my-2">
-                        {/* Decorative quote marks */}
-                        <span className="absolute top-0 left-0 text-6xl text-amber-200/50 font-serif leading-none">“</span>
-                        <span className="absolute bottom-0 right-0 text-6xl text-amber-200/50 font-serif leading-none">”</span>
+                        <div className="relative my-1 w-full py-5 sm:py-6">
+                            {/* Decorative quote marks */}
+                            <span className="pointer-events-none absolute left-0 top-0 font-serif text-4xl leading-none text-amber-200/60 sm:text-6xl" aria-hidden="true">
+                                &ldquo;
+                            </span>
+                            <span className="pointer-events-none absolute bottom-0 right-0 font-serif text-4xl leading-none text-amber-200/60 sm:text-6xl" aria-hidden="true">
+                                &rdquo;
+                            </span>
 
-                        <div className="font-display text-gray-700 text-lg md:text-xl leading-relaxed italic px-6 whitespace-pre-line text-left">
-                            {letter.content}
+                            <div className="whitespace-pre-line px-3 text-left font-display text-base italic leading-relaxed text-stone-700 sm:px-6 sm:text-lg md:text-xl">
+                                {letter.content}
+                            </div>
                         </div>
+
+                        {letter.videoSrc && (
+                            <div className="relative mb-4 aspect-video w-full max-w-2xl shrink-0 overflow-hidden rounded-lg border-2 border-amber-500/50 bg-black shadow-xl sm:mb-6 sm:border-4">
+                                <video
+                                    src={letter.videoSrc}
+                                    controls
+                                    preload="metadata"
+                                    playsInline
+                                    className="h-full w-full object-contain"
+                                />
+                            </div>
+                        )}
                     </div>
-
-                    {letter.videoSrc && (
-                        <div className="w-full max-w-2xl mx-auto mb-6 rounded-lg overflow-hidden border-4 border-amber-500/50 shadow-2xl bg-black relative group aspect-video flex-shrink-0">
-                            <video
-                                src={letter.videoSrc}
-                                controls
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                    )}
-
-
                 </div>
             </div>
         </div>,

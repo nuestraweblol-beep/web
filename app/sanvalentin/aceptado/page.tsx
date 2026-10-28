@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft, Heart } from 'lucide-react';
 import "./aceptado.css";
 
 const AceptadoPage = () => {
@@ -9,7 +10,11 @@ const AceptadoPage = () => {
     return (
         <div className="aceptado-page">
             <div className="aceptado-content">
-                <div className="celebration-emoji">🎉💕🎊</div>
+                <div className="celebration-emoji" aria-hidden="true">
+                    <Heart className="size-10" fill="currentColor" />
+                    <Heart className="size-14" fill="currentColor" />
+                    <Heart className="size-10" fill="currentColor" />
+                </div>
 
                 <h1 className="aceptado-title">
                     Yeeeeiii dijiste que sí!
@@ -30,7 +35,7 @@ const AceptadoPage = () => {
 
                 <div className="love-declaration">
                     <div className="love-icon">
-                        <img src="/img/ani.jpeg" alt="Ani" />
+                        <img src="/img/ani.jpeg" alt="Ani" loading="lazy" decoding="async" />
                     </div>
                     <p className="love-text">
                         Eres el amor de mi vida y no puedo esperar para seguir creando recuerdos juntos.
@@ -41,7 +46,8 @@ const AceptadoPage = () => {
                     className="back-button"
                     onClick={() => router.push('/extras')}
                 >
-                    Volver a Extras ✨
+                    <ArrowLeft className="inline-block size-5 align-middle" aria-hidden="true" />
+                    Volver a Extras
                 </button>
             </div>
         </div>

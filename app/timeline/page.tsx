@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { timelineService, TimelineEntry } from "@/lib/services/timelineService";
-import { Heart, Calendar, ArrowRight, Star, Infinity as InfinityIcon } from "lucide-react";
+import { Heart, Star, Infinity as InfinityIcon } from "lucide-react";
 import { Loader2 } from "lucide-react";
 
 export default function TimelinePage() {
@@ -11,7 +11,7 @@ export default function TimelinePage() {
     const [loading, setLoading] = useState(true);
 
     // Client-side visual state
-    const [stars, setStars] = useState<{ top: string; left: string; size: string; delay: string }[]>([]);
+    const [stars, setStars] = useState<{ top: string; left: string; size: string; delay: string; opacity: number }[]>([]);
 
     useEffect(() => {
         const fetchEntries = async () => {
@@ -27,12 +27,13 @@ export default function TimelinePage() {
 
         fetchEntries();
 
-        // Start background stars
-        const newStars = Array.from({ length: 30 }).map(() => ({
+        // Decorative stars — generated once on the client, never during render
+        const newStars = Array.from({ length: 18 }).map(() => ({
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
-            size: `${Math.random() * 3 + 1}px`,
+            size: `${Math.random() * 2.5 + 1}px`,
             delay: `${Math.random() * 5}s`,
+            opacity: Math.random() * 0.6 + 0.25,
         }));
         setStars(newStars);
     }, []);
@@ -49,112 +50,118 @@ export default function TimelinePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-                <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
+            <div className="flex min-h-[100svh] items-center justify-center bg-night">
+                <Loader2 className="h-10 w-10 animate-spin text-purple-400" aria-label="Cargando" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#0F0F1A] text-white relative overflow-x-hidden">
+        <div className="relative min-h-[100svh] overflow-x-hidden bg-[#0F0F1A] pt-[var(--nav-offset)] text-white">
             {/* Background Ambience */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-purple-900/40 to-transparent" />
-                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-indigo-900/30 rounded-full blur-[100px]" />
+                <div className="absolute top-0 left-0 h-[500px] w-full bg-gradient-to-b from-purple-900/40 to-transparent" />
+                <div className="absolute bottom-0 right-0 size-[500px] rounded-full bg-indigo-900/30 blur-[100px]" />
 
                 {/* Stars */}
                 {stars.map((star, i) => (
                     <div
                         key={i}
-                        className="absolute bg-white rounded-full animate-pulse-slow"
+                        className="absolute rounded-full bg-white animate-pulse-slow"
                         style={{
                             top: star.top,
                             left: star.left,
                             width: star.size,
                             height: star.size,
                             animationDelay: star.delay,
-                            opacity: Math.random() * 0.7 + 0.3
+                            opacity: star.opacity,
                         }}
                     />
                 ))}
             </div>
 
-            <main className="relative z-10 container mx-auto px-4 py-20">
+            <main className="page-container relative z-10 py-12 sm:py-16 md:py-20">
 
                 {/* Header */}
-                <div className="text-center mb-24 animate-fade-in-up">
-                    <div className="inline-block p-4 rounded-full bg-purple-500/10 mb-6 backdrop-blur-sm border border-purple-500/30 shadow-[0_0_30px_-5px_rgba(168,85,247,0.4)]">
-                        <InfinityIcon className="w-10 h-10 text-purple-400" />
+                <div className="mb-14 text-center animate-fade-in-up sm:mb-20 md:mb-24">
+                    <div className="mb-5 inline-grid size-16 place-items-center rounded-full border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm sm:mb-6 sm:size-20">
+                        <InfinityIcon className="size-8 text-purple-400 sm:size-10" aria-hidden="true" />
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-200 via-pink-200 to-indigo-200 bg-clip-text text-transparent font-serif">
+                    <h1 className="mb-4 text-balance bg-gradient-to-r from-purple-200 via-pink-200 to-indigo-200 bg-clip-text font-display text-3xl font-bold leading-tight text-transparent sm:mb-6 sm:text-5xl md:text-7xl">
                         Nuestra Historia Eterna
                     </h1>
-                    <p className="text-xl text-purple-200/60 max-w-2xl mx-auto leading-relaxed">
+                    <p className="mx-auto max-w-2xl text-base leading-relaxed text-purple-200/60 sm:text-lg md:text-xl">
                         Cada momento contigo es un universo de recuerdos que quiero atesorar por siempre en esta línea del tiempo infinita.
                     </p>
                 </div>
 
-                {/* Timeline Container */}
-                <div className="relative max-w-5xl mx-auto">
+                {entries.length === 0 ? (
+                    <div className="mx-auto max-w-md rounded-3xl border border-dashed border-white/15 bg-white/5 px-6 py-14 text-center">
+                        <Star className="mx-auto mb-4 size-8 text-purple-300/50" aria-hidden="true" />
+                        <p className="font-display text-xl text-white">La línea del tiempo está esperando</p>
+                        <p className="mt-2 text-sm text-purple-200/60">
+                            Los recuerdos aparecerán aquí cuando existan.
+                        </p>
+                    </div>
+                ) : (
+                /* Timeline Container */
+                <div className="relative mx-auto max-w-5xl">
                     {/* Central Line */}
-                    <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500/0 via-purple-500/50 to-purple-500/0 md:-translate-x-1/2" />
+                    <div className="absolute inset-y-0 left-4 w-px bg-gradient-to-b from-purple-500/0 via-purple-500/50 to-purple-500/0 md:left-1/2 md:-translate-x-1/2" />
 
-                    <div className="space-y-24">
+                    <div className="space-y-14 sm:space-y-20 md:space-y-24">
                         {entries.map((entry, index) => (
                             <div
                                 key={entry.id}
-                                className={`relative flex flex-col md:flex-row gap-8 md:gap-16 items-center ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                                className={`relative flex flex-col items-center gap-6 md:flex-row md:gap-16 ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
                                     }`}
                             >
 
                                 {/* Timeline Dot */}
-                                <div className="absolute left-4 md:left-1/2 w-4 h-4 bg-purple-400 rounded-full md:-translate-x-1/2 shadow-[0_0_15px_rgba(192,132,252,0.8)] border-4 border-[#0F0F1A] z-20 mt-1.5 md:mt-0">
-                                    <div className="absolute inset-0 bg-purple-400 animate-ping opacity-75 rounded-full" />
-                                </div>
-
-                                {/* Date Mobile (Left aligned next to dot) */}
-                                <div className="md:hidden pl-12 mb-2 w-full text-purple-300 font-serif italic text-lg opacity-80">
-                                    {entry.fecha_display || formatearFecha(entry.fecha)}
+                                <div className="absolute left-4 top-2 z-20 size-3 rounded-full border-2 border-[#0F0F1A] bg-purple-400 shadow-[0_0_12px_rgba(192,132,252,0.7)] md:left-1/2 md:top-0 md:size-4 md:-translate-x-1/2">
+                                    {index === 0 && (
+                                        <span className="absolute inset-0 rounded-full bg-purple-400 opacity-60 animate-ping" aria-hidden="true" />
+                                    )}
                                 </div>
 
                                 {/* Content Card */}
-                                <div className={`w-full md:w-1/2 pl-12 md:pl-0 ${index % 2 === 0 ? "md:text-right md:pr-8" : "md:text-left md:pl-8"}`}>
-                                    <div className="group relative bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl hover:bg-white/10 transition-all duration-500 hover:shadow-[0_0_30px_-10px_rgba(168,85,247,0.3)] hover:-translate-y-1">
+                                <div className={`w-full min-w-0 pl-10 md:w-1/2 md:pl-0 ${index % 2 === 0 ? "md:pr-8 md:text-right" : "md:pl-8 md:text-left"}`}>
+                                    <div className="group relative rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 sm:p-6">
 
-                                        <div className={`hidden md:block absolute top-6 ${index % 2 === 0 ? "-right-3" : "-left-3"} w-6 h-6 bg-[#1a1a2e] rotate-45 border-t border-r border-white/10`}
+                                        <div className={`absolute top-6 hidden size-6 rotate-45 border-t border-r border-white/10 bg-[#1a1a2e] md:block ${index % 2 === 0 ? "-right-3" : "-left-3"}`}
                                             style={{ transform: index % 2 === 0 ? 'rotate(45deg)' : 'rotate(-135deg)', zIndex: -1 }}
                                         />
 
-                                        <h3 className="text-2xl font-bold text-white mb-3 font-serif">{entry.titulo}</h3>
-                                        <p className="text-purple-200/80 leading-relaxed mb-4 font-light">
-                                            {entry.descripcion}
+                                        <p className="mb-2 font-display text-base italic text-purple-300/80 md:hidden">
+                                            {entry.fecha_display || formatearFecha(entry.fecha)}
                                         </p>
 
-                                        <div className={`md:hidden mt-4 pt-4 border-t border-white/10 flex items-center gap-2 text-sm text-purple-300`}>
-                                            <Calendar className="w-4 h-4" />
-                                            {entry.fecha_display || formatearFecha(entry.fecha)}
-                                        </div>
+                                        <h3 className="mb-3 text-balance font-display text-xl font-bold leading-snug text-white sm:text-2xl">{entry.titulo}</h3>
+                                        <p className="whitespace-pre-wrap text-sm font-light leading-relaxed text-purple-200/80 sm:text-base">
+                                            {entry.descripcion}
+                                        </p>
                                     </div>
                                 </div>
 
                                 {/* Date Desktop & Image */}
-                                <div className={`w-full md:w-1/2 pl-12 md:pl-0 ${index % 2 === 0 ? "md:pl-8" : "md:pr-8 md:text-right"}`}>
-                                    <div className="hidden md:block text-2xl font-serif text-purple-300 mb-4 opacity-80 italic">
+                                <div className={`w-full min-w-0 pl-10 md:w-1/2 md:pl-0 ${index % 2 === 0 ? "md:pl-8" : "md:pr-8 md:text-right"}`}>
+                                    <div className="mb-4 hidden font-display text-xl italic text-purple-300/80 md:block lg:text-2xl">
                                         {entry.fecha_display || formatearFecha(entry.fecha)}
                                     </div>
 
                                     {entry.foto && (
-                                        <div className="relative h-64 w-full md:w-80 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/10 group cursor-pointer ml-auto mr-auto md:mx-0">
+                                        <div className="relative h-56 w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl sm:h-64 md:mx-0 md:w-80">
                                             <Image
                                                 src={entry.foto}
                                                 alt={entry.titulo}
                                                 fill
-                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                                sizes="(max-width: 768px) 100vw, 320px"
+                                                className="object-cover"
                                             />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F1A]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-4">
-                                                <span className="text-white text-sm tracking-widest uppercase flex items-center gap-2">
-                                                    <Heart className="w-4 h-4 text-purple-500 fill-purple-500" />
-                                                    Ver Recuerdo
+                                            <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-[#0F0F1A]/80 to-transparent p-4">
+                                                <span className="flex items-center gap-2 text-xs uppercase tracking-widest text-white/80">
+                                                    <Heart className="size-3.5 fill-purple-500 text-purple-500" aria-hidden="true" />
+                                                    Recuerdo
                                                 </span>
                                             </div>
                                         </div>
@@ -165,13 +172,14 @@ export default function TimelinePage() {
                         ))}
 
                         {/* End of Timeline */}
-                        <div className="pt-20 text-center relative z-20">
-                            <div className="inline-block p-1 px-8 rounded-full bg-gradient-to-r from-transparent via-purple-500/20 to-transparent text-purple-200/60 text-sm tracking-[0.3em] uppercase animate-pulse">
+                        <div className="relative z-20 pt-8 text-center sm:pt-16">
+                            <div className="inline-block rounded-full bg-gradient-to-r from-transparent via-purple-500/20 to-transparent px-6 py-1 text-xs uppercase tracking-[0.3em] text-purple-200/60 sm:px-8 sm:text-sm">
                                 La historia continúa...
                             </div>
                         </div>
                     </div>
                 </div>
+                )}
             </main>
 
             <style jsx global>{`

@@ -56,7 +56,7 @@
     background: var(--gradient-christmas);
     color: hsl(var(--foreground));
     font-family: var(--font-display);
-    min-height: 100vh;
+    min-height: 100svh;
 }
 
 /* Utilities inside the theme */

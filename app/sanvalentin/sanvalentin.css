@@ -3,13 +3,14 @@
 .valentine-page {
     font-family: 'Georgia', 'Times New Roman', serif;
     background: linear-gradient(135deg, #fff5f7 0%, #ffe4e9 50%, #ffd4e0 100%);
-    min-height: 100vh;
+    min-height: 100svh;
+    padding-top: var(--nav-offset);
 }
 
 /* Hero Section */
 .hero-valentine {
     position: relative;
-    min-height: 100vh;
+    min-height: calc(100svh - var(--nav-offset));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -29,7 +30,9 @@
 
 .floating-hearts .heart {
     position: absolute;
-    font-size: 2rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    color: rgba(255, 255, 255, 0.75);
     animation: float 15s infinite ease-in-out;
     opacity: 0.6;
 }
@@ -221,12 +224,16 @@
 
 .letter-decoration {
     position: absolute;
-    top: -30px;
+    top: -1.35rem;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 3rem;
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 2.75rem;
+    color: #c44569;
     background: white;
-    padding: 0 1rem;
+    padding: 0 0.5rem;
 }
 
 .valentine-letter-content {
@@ -326,8 +333,16 @@
 }
 
 .reason-icon {
-    font-size: 3rem;
+    display: grid;
+    place-items: center;
     margin-bottom: 1rem;
+    color: #c44569;
+}
+
+.reason-icon svg {
+    width: 2.5rem;
+    height: 2.5rem;
+    stroke-width: 1.5;
 }
 
 .reason-card h3 {
@@ -405,10 +420,10 @@
 
 /* Proposal Section */
 .proposal-section {
-    padding: 8rem 2rem;
+    padding: 5rem 1.5rem;
     background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
     color: white;
-    min-height: 100vh;
+    min-height: calc(100svh - var(--nav-offset));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -421,8 +436,10 @@
 }
 
 .proposal-heart {
-    font-size: 5rem;
-    margin-bottom: 2rem;
+    display: grid;
+    place-items: center;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
     animation: heartbeat 1.5s infinite;
 }
 
@@ -514,12 +531,16 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .hero-valentine {
+        padding: 2.5rem 1.25rem;
+    }
+
     .hero-title-valentine {
-        font-size: 2.5rem;
+        font-size: 2.25rem;
     }
 
     .title-highlight {
-        font-size: 1.8rem;
+        font-size: 1.35rem;
     }
 
     .hero-text-valentine {
